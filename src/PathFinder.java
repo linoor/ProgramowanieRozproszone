@@ -3,7 +3,7 @@ import java.util.DoubleSummaryStatistics;
 /**
  * Created by linoor on 10/23/15.
  */
-public class PathFinder implements PathFinderInterface {
+class PathFinder implements PathFinderInterface {
     @Override
     public void setMaxThreads(int i) {
 
