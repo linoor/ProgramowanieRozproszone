@@ -6,8 +6,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class PathFinder implements PathFinderInterface {
 
-    private final static AtomicInteger maxThreads = new AtomicInteger();
+    private static final AtomicInteger maxThreads = new AtomicInteger();
     private static final AtomicBoolean exitFound = new AtomicBoolean(false);
+    private static double shortestDistanceSoFar = Double.MAX_VALUE;
+    private static Runnable observer;
 
     @Override
     public void setMaxThreads(int i) {
@@ -21,7 +23,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void registerObserver(Runnable code) {
-
+        observer = code;
     }
 
     @Override
@@ -34,10 +36,7 @@ class PathFinder implements PathFinderInterface {
     }
 
     @Override
-    public double getShortestDistanceToExit() {
-        if (!exitFound()) {
-            return Double.MAX_VALUE;
-        }
-        return 0;
+    public synchronized double getShortestDistanceToExit() {
+        return shortestDistanceSoFar;
     }
 }

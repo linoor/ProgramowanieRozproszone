@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -10,6 +9,7 @@ public class Room implements RoomInterface {
 
     private final AtomicBoolean isExit = new AtomicBoolean(false);
     private List<RoomInterface> corridors = new ArrayList<>();
+    private double distanceFromStart = 0.0;
 
     @Override
     public boolean isExit() {
@@ -18,7 +18,9 @@ public class Room implements RoomInterface {
 
     @Override
     public double getDistanceFromStart() {
-        return 0;
+        synchronized (this) {
+            return distanceFromStart;
+        }
     }
 
     @Override
