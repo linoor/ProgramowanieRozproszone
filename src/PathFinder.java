@@ -1,12 +1,17 @@
-import java.util.DoubleSummaryStatistics;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by linoor on 10/23/15.
  */
 class PathFinder implements PathFinderInterface {
+
+    private final static AtomicInteger maxThreads = new AtomicInteger();
+    private static final AtomicBoolean exitFound = new AtomicBoolean(false);
+
     @Override
     public void setMaxThreads(int i) {
-
+        maxThreads.getAndSet(i);
     }
 
     @Override
@@ -21,7 +26,11 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public boolean exitFound() {
-        return false;
+        return exitFound.get();
+    }
+
+    public void findExit() {
+        exitFound.getAndSet(true);
     }
 
     @Override
