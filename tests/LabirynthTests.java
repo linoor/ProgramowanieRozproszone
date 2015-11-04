@@ -31,12 +31,14 @@ public class LabirynthTests {
         Room six = new Room("six", 3.0);
         Room seven = new Room("seven", 4.0);
         Room eight = new Room("eight", 8.0);
+        Room nine = new Room("nine", 3.0);
 
         first.addCorridor(two);
         first.addCorridor(three);
         first.addCorridor(four);
 
         three.addCorridor(eight);
+        three.addCorridor(nine);
 
         four.addCorridor(five);
 
@@ -45,9 +47,11 @@ public class LabirynthTests {
         six.addCorridor(seven);
 
         seven.setExit();
+        nine.setExit();
+        eight.setExit();
 
         PathFinderInterface pathFinder = new PathFinder();
         pathFinder.entranceToTheLabyrinth(first);
-        assertEquals(4.0, pathFinder.getShortestDistanceToExit());
+        assertEquals(3.0, pathFinder.getShortestDistanceToExit());
     }
 }
