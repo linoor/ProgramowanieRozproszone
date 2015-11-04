@@ -19,11 +19,8 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void entranceToTheLabyrinth(RoomInterface mi) {
-        CorridorExplorer corridorExplorer = new CorridorExplorer();
-        for (RoomInterface corridor : mi.corridors()) {
-            corridorExplorer.explore(corridor);
-        }
         long startTime = System.nanoTime();
+        new CorridorExplorer(mi).explore();
         System.out.println("Elapsed time " + (double) (System.nanoTime() - startTime) / 1000000000.0 + " seconds");
     }
 
@@ -50,8 +47,15 @@ class PathFinder implements PathFinderInterface {
         return shortestDistanceSoFar;
     }
 
-    private class CorridorExplorer {
-        public void explore(RoomInterface room) {
+    private class CorridorExplorer implements Runnable {
+
+        private RoomInterface room;
+
+        public CorridorExplorer(RoomInterface roomInterface) {
+            this.room = roomInterface;
+        }
+
+        public void explore() {
            System.out.println(room.toString());
            if (room.isExit()) {
                synchronized (exitFoundLock) {
@@ -77,8 +81,14 @@ class PathFinder implements PathFinderInterface {
                return;
            }
            for (RoomInterface corridor : room.corridors()) {
-              explore(corridor);
+              this.room = corridor;
+              explore();
            }
+        }
+
+        @Override
+        public void run() {
+           explore();
         }
     }
 }
