@@ -22,18 +22,6 @@ public class LabirynthTests {
     }
 
     @Test
-    public void testDistanceFromStartFromSecondRoom() {
-        Room entrance = new Room();
-        Room secondRoom = new Room();
-        entrance.addCorridor(secondRoom);
-
-        PathFinderInterface pathFinder = new PathFinder();
-        pathFinder.entranceToTheLabyrinth(entrance);
-
-        assertEquals(1.0, secondRoom.getDistanceFromStart());
-    }
-
-    @Test
     public void testSimpleLabirynth() {
         Room first = new Room();
         Room two = new Room();
@@ -50,10 +38,18 @@ public class LabirynthTests {
         four.addCorridor(seven);
         four.addCorridor(five);
         // set way from four to seven equal to 4
-        four.setDistance(four, 4);
+        try {
+            four.setDistance(seven, 4);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         five.addCorridor(six);
 
         six.addCorridor(seven);
+
+        PathFinderInterface pathFinder = new PathFinder();
+        pathFinder.entranceToTheLabyrinth(first);
+        assertEquals(4, pathFinder.getShortestDistanceToExit());
     }
 }
