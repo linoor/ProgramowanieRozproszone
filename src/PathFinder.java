@@ -34,14 +34,6 @@ class PathFinder implements PathFinderInterface {
         return exitFound.get();
     }
 
-    public void findExit() {
-        exitFound.getAndSet(true);
-    }
-
-    public void bestPathFound() {
-        observer.run();
-    }
-
     @Override
     public synchronized double getShortestDistanceToExit() {
         return shortestDistanceSoFar;
