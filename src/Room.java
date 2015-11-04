@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,8 +9,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Room implements RoomInterface {
 
     private final AtomicBoolean isExit = new AtomicBoolean(false);
-    private Map<RoomInterface, Integer> corridorsAndLenghts = new HashMap<>();
+    private Map<RoomInterface, Integer> corridorsAndLengths = new HashMap<>();
     private double distanceFromStart = 0.0;
+
+    private String name = "";
+
+    public Room(String name, double distanceFromStart) {
+        this.name = name;
+        this.distanceFromStart = distanceFromStart;
+    }
+
+    public void setExit() {
+        isExit.set(true);
+    }
 
     @Override
     public boolean isExit() {
@@ -27,23 +37,29 @@ public class Room implements RoomInterface {
 
     @Override
     public RoomInterface[] corridors() {
-        Set<RoomInterface> corridors = corridorsAndLenghts.keySet();
+        Set<RoomInterface> corridors = corridorsAndLengths.keySet();
         if (corridors.size() == 0) {
             return null;
         }
 
-        return (RoomInterface[]) corridors.toArray();
+        RoomInterface[] result = corridors.toArray(new RoomInterface[corridors.size()]);
+        return result;
     }
 
     public void addCorridor(RoomInterface newRoom) {
-        corridorsAndLenghts.put(newRoom, 1);
+        corridorsAndLengths.put(newRoom, 1);
     }
 
     public void setDistance(Room room, int distance) throws Exception {
-        if (!corridorsAndLenghts.containsKey(room)) {
+        if (!corridorsAndLengths.containsKey(room)) {
             throw new Exception("Can't set the distance, the key does not exist.");
         }
 
-        corridorsAndLenghts.put(room, distance);
+        corridorsAndLengths.put(room, distance);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -10,6 +10,7 @@ class PathFinder implements PathFinderInterface {
     private static final AtomicBoolean exitFound = new AtomicBoolean(false);
     private static double shortestDistanceSoFar = Double.MAX_VALUE;
     private static Runnable observer;
+    private static Object exitFoundLock = new Object();
 
     @Override
     public void setMaxThreads(int i) {
@@ -18,7 +19,10 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void entranceToTheLabyrinth(RoomInterface mi) {
-
+        CorridorExplorer corridorExplorer = new CorridorExplorer();
+        for (RoomInterface corridor : mi.corridors()) {
+            corridorExplorer.explore(corridor);
+        }
     }
 
     @Override
@@ -35,8 +39,33 @@ class PathFinder implements PathFinderInterface {
         exitFound.getAndSet(true);
     }
 
+    public void bestPathFound() {
+        observer.run();
+    }
+
     @Override
     public synchronized double getShortestDistanceToExit() {
         return shortestDistanceSoFar;
+    }
+
+    private class CorridorExplorer {
+        public void explore(RoomInterface room) {
+           System.out.println(room.toString());
+           if (room.isExit()) {
+               synchronized (exitFoundLock) {
+                   exitFound.set(true);
+                   double distanceFromStart = room.getDistanceFromStart();
+                   if (distanceFromStart < shortestDistanceSoFar) {
+                       shortestDistanceSoFar = distanceFromStart;
+                   }
+               }
+           }
+           if (room.corridors() == null) {
+               return;
+           }
+           for (RoomInterface corridor : room.corridors()) {
+              explore(corridor);
+           }
+        }
     }
 }
