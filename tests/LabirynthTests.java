@@ -1,6 +1,5 @@
 import org.junit.Test;
 
-import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertEquals;
 
 
@@ -35,16 +34,26 @@ public class LabirynthTests {
     }
 
     @Test
-    public void testDistanceFromStartFromThirdRoom() {
-        Room entrance = new Room();
-        Room secondRoom = new Room();
-        Room thirdRoom = new Room();
-        entrance.addCorridor(secondRoom);
-        secondRoom.addCorridor(thirdRoom);
+    public void testSimpleLabirynth() {
+        Room first = new Room();
+        Room two = new Room();
+        Room three = new Room();
+        Room four = new Room();
+        Room five = new Room();
+        Room six = new Room();
+        Room seven = new Room();
 
-        PathFinderInterface pathFinder = new PathFinder();
-        pathFinder.entranceToTheLabyrinth(entrance);
+        first.addCorridor(two);
+        first.addCorridor(three);
+        first.addCorridor(four);
 
-        assertEquals(2.0, thirdRoom.getDistanceFromStart());
+        four.addCorridor(seven);
+        four.addCorridor(five);
+        // set way from four to seven equal to 4
+        four.setDistance(four, 4);
+
+        five.addCorridor(six);
+
+        six.addCorridor(seven);
     }
 }
