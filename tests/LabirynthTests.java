@@ -54,6 +54,7 @@ public class LabirynthTests {
         eight.setExit();
 
         PathFinderInterface pathFinder = new PathFinder();
+        pathFinder.setMaxThreads(4);
         pathFinder.entranceToTheLabyrinth(first);
         assertEquals(3.0, pathFinder.getShortestDistanceToExit());
     }

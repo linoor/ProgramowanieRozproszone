@@ -7,10 +7,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 class PathFinder implements PathFinderInterface {
 
     private static final AtomicInteger maxThreads = new AtomicInteger();
+    private static final AtomicInteger threadsUsed = new AtomicInteger();
     private static final AtomicBoolean exitFound = new AtomicBoolean(false);
     private static double shortestDistanceSoFar = Double.MAX_VALUE;
     private static Runnable observer;
     private static Object exitFoundLock = new Object();
+    private static Object threadsUsedLock = new Object();
+
+    public PathFinder() {
+        threadsUsed.set(0);
+        maxThreads.set(0);
+    }
 
     @Override
     public void setMaxThreads(int i) {
@@ -35,7 +42,7 @@ class PathFinder implements PathFinderInterface {
     }
 
     @Override
-    public synchronized double getShortestDistanceToExit() {
+    public double getShortestDistanceToExit() {
         return shortestDistanceSoFar;
     }
 
@@ -75,13 +82,22 @@ class PathFinder implements PathFinderInterface {
            }
            for (RoomInterface corridor : room.corridors()) {
                this.room = corridor;
-               run();
-           }
+                   if (threadsUsed.get() < maxThreads.get()) {
+                       synchronized (threadsUsedLock) {
+                           new Thread(new CorridorExplorer(corridor)).start();
+                           threadsUsed.set(threadsUsed.get() + 1);
+                       }
+                   } else {
+                       explore();
+                   }
+               }
         }
 
         @Override
         public void run() {
+            System.out.println("USING A THREAD NUMBER OF THREADS " + threadsUsed.get());
             explore();
+            threadsUsed.set(threadsUsed.get()-1);
         }
     }
 }
