@@ -26,9 +26,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void entranceToTheLabyrinth(RoomInterface mi) {
-        long startTime = System.nanoTime();
         new CorridorExplorer(mi).explore();
-        System.out.println("Elapsed time " + (double) (System.nanoTime() - startTime) / 1000000000.0 + " seconds");
     }
 
     @Override
@@ -60,11 +58,7 @@ class PathFinder implements PathFinderInterface {
                synchronized (exitFoundLock) {
                    exitFound.set(true);
                    double distanceFromStart = room.getDistanceFromStart();
-                   System.out.println(String.format(
-                           "Found an exit at room %s. The distance to the entrance is %slonger than the shortest distance found so far",
-                           room.toString(),
-                           distanceFromStart < shortestDistanceSoFar ? "" : "NOT "
-                   ));
+                   System.out.println("Found an exit at room " + room);
                    if (distanceFromStart < shortestDistanceSoFar) {
                        System.out.println(
                                "Found new shortest distance at room "
