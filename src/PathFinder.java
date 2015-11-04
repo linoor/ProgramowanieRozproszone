@@ -69,18 +69,19 @@ class PathFinder implements PathFinderInterface {
                    }
                }
            }
-           if (room.corridors() == null) {
+           if (room.corridors() == null ||
+                   room.getDistanceFromStart() >= shortestDistanceSoFar) {
                return;
            }
            for (RoomInterface corridor : room.corridors()) {
-              this.room = corridor;
-              explore();
+               this.room = corridor;
+               run();
            }
         }
 
         @Override
         public void run() {
-           explore();
+            explore();
         }
     }
 }

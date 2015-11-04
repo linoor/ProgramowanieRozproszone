@@ -32,6 +32,7 @@ public class LabirynthTests {
         Room seven = new Room("seven", 4.0);
         Room eight = new Room("eight", 8.0);
         Room nine = new Room("nine", 3.0);
+        Room ten = new Room("ten", 9.0);
 
         first.addCorridor(two);
         first.addCorridor(three);
@@ -45,6 +46,8 @@ public class LabirynthTests {
         five.addCorridor(six);
 
         six.addCorridor(seven);
+
+        eight.addCorridor(ten);
 
         seven.setExit();
         nine.setExit();
