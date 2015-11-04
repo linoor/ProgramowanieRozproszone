@@ -23,6 +23,8 @@ class PathFinder implements PathFinderInterface {
         for (RoomInterface corridor : mi.corridors()) {
             corridorExplorer.explore(corridor);
         }
+        long startTime = System.nanoTime();
+        System.out.println("Elapsed time " + (double) (System.nanoTime() - startTime) / 1000000000.0 + " seconds");
     }
 
     @Override
@@ -55,7 +57,18 @@ class PathFinder implements PathFinderInterface {
                synchronized (exitFoundLock) {
                    exitFound.set(true);
                    double distanceFromStart = room.getDistanceFromStart();
+                   System.out.println(String.format(
+                           "Found an exit at room %s. The distance to the entrance is %slonger than the shortest distance found so far",
+                           room.toString(),
+                           distanceFromStart < shortestDistanceSoFar ? "" : "NOT "
+                   ));
                    if (distanceFromStart < shortestDistanceSoFar) {
+                       System.out.println(
+                               "Found new shortest distance at room "
+                                       + room.toString()
+                                       +", new distance: "
+                                       + distanceFromStart
+                       );
                        shortestDistanceSoFar = distanceFromStart;
                    }
                }
