@@ -43,7 +43,9 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public double getShortestDistanceToExit() {
-        return shortestDistanceSoFar;
+        synchronized (exitFoundLock) {
+            return shortestDistanceSoFar;
+        }
     }
 
     private class CorridorExplorer implements Runnable {
@@ -56,8 +58,8 @@ class PathFinder implements PathFinderInterface {
 
         public void explore() {
            System.out.println(room.toString());
+           synchronized (exitFoundLock) {
            if (room.isExit()) {
-               synchronized (exitFoundLock) {
                    exitFound.set(true);
                    double distanceFromStart = room.getDistanceFromStart();
                    System.out.println("Found an exit at room " + room);
