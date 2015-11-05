@@ -1,3 +1,4 @@
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -10,7 +11,7 @@ class PathFinder implements PathFinderInterface {
     private static final AtomicInteger threadsUsed = new AtomicInteger();
     private static final AtomicBoolean exitFound = new AtomicBoolean(false);
     private static double shortestDistanceSoFar = Double.MAX_VALUE;
-    private static Runnable observer;
+    private static Optional<Runnable> observer = Optional.empty();
     private static Object exitFoundLock = new Object();
     private static Object threadsUsedLock = new Object();
 
@@ -28,12 +29,12 @@ class PathFinder implements PathFinderInterface {
     public void entranceToTheLabyrinth(RoomInterface mi) {
         new CorridorExplorer(mi).explore();
         while (threadsUsed.get() > 0) {}
-        observer.run();
+        observer.ifPresent(Runnable::run);
     }
 
     @Override
     public void registerObserver(Runnable code) {
-        observer = code;
+        observer = Optional.of(code);
     }
 
     @Override

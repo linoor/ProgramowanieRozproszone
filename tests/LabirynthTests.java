@@ -55,6 +55,7 @@ public class LabirynthTests {
 
         PathFinderInterface pathFinder = new PathFinder();
         pathFinder.setMaxThreads(4);
+        pathFinder.registerObserver(new Observer());
         pathFinder.entranceToTheLabyrinth(first);
         assertEquals(3.0, pathFinder.getShortestDistanceToExit());
     }
