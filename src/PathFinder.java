@@ -28,6 +28,7 @@ class PathFinder implements PathFinderInterface {
     public void entranceToTheLabyrinth(RoomInterface mi) {
         new CorridorExplorer(mi).explore();
         while (threadsUsed.get() > 0) {}
+        observer.run();
     }
 
     @Override
