@@ -39,6 +39,11 @@ public class Task implements  TaskInterface {
 
     @Override
     public TaskInterface work(int queue) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println(String.format("Task %d is working in queue %d...", getTaskID(), queue));
         return this;
     }
