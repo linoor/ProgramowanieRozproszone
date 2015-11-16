@@ -70,7 +70,7 @@ public class System implements SystemInterface {
 
         public void awaitTermination() {
             try {
-                queueExecutors.awaitTermination(3, TimeUnit.SECONDS);
+                queueExecutors.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -85,9 +85,6 @@ public class System implements SystemInterface {
                         if (tasksWaiting.get(queueNum).peek() != null) {
                             taskToRun[0] = tasksWaiting.get(queueNum).remove();
                             tasksInProgress.get(queueNum).add(taskToRun[0]);
-                            java.lang.System.out.println(String.format("" +
-                                    "Queue %d Task %d in progress!",
-                                    queueNum, taskToRun[0].getTaskID()));
                         }
                     }
                 }

@@ -40,7 +40,7 @@ public class Task implements  TaskInterface {
     @Override
     public TaskInterface work(int queue) {
         try {
-            Thread.sleep(500);
+            Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
