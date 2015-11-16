@@ -56,6 +56,19 @@ public class System implements SystemInterface {
 
     private class QueueManager implements Runnable {
 
+        public final String[] colors = {
+        "\u001B[30m",
+        "\u001B[31m",
+        "\u001B[32m",
+        "\u001B[33m",
+        "\u001B[34m",
+        "\u001B[35m",
+        "\u001B[36m",
+        "\u001B[37m"
+        };
+
+        public String ANSI_RESET = "\u001B[0m";
+
         private int queueNum;
 
         private ExecutorService queueExecutors = Executors.newSingleThreadExecutor();
@@ -76,6 +89,13 @@ public class System implements SystemInterface {
             }
         }
 
+        public void print(int taskNum, String message) {
+            java.lang.System.out.println(
+                    String.format(colors[queueNum] + String.format("Queue %d ", queueNum)
+                            + colors[colors.length-taskNum] + String.format("Task %d: ", taskNum)
+                            + ANSI_RESET + message));
+        }
+
         @Override
         public void run() {
             while (true) {
@@ -90,17 +110,14 @@ public class System implements SystemInterface {
                 }
                 if (taskToRun[0] != null) {
                     queueExecutors.submit(() -> {
-                        java.lang.System.out.println(String.format("Queue %d Task %d working!", queueNum, taskToRun[0].getTaskID()));
+                        print(taskToRun[0].getTaskID(), "working!");
                         TaskInterface result = taskToRun[0].work(queueNum);
                         tasksInProgress.get(queueNum).remove(taskToRun[0]);
                         if (taskToRun[0].getLastQueue() != queueNum) {
-                            java.lang.System.out.println(String.format(
-                                    "Task %d moved from %d to %d!",
-                                            taskToRun[0].getTaskID(), queueNum, queueNum+1)
-                            );
+                            print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum+1));
                             tasksWaiting.get(queueNum + 1).add(result);
                         } else {
-                            java.lang.System.out.println(String.format("Task %d FINISHED!", taskToRun[0].getTaskID()));
+                            print(taskToRun[0].getTaskID(), "FINISHED!");
                         }
                     });
                 }

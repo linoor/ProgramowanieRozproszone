@@ -44,7 +44,6 @@ public class Task implements  TaskInterface {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        java.lang.System.out.println(String.format("Task %d is working in queue %d...", getTaskID(), queue));
         return this;
     }
 }
