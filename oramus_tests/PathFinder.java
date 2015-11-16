@@ -58,39 +58,44 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
-           System.out.println(room.toString());
-           synchronized (exitFoundLock) {
-           if (room.isExit()) {
-                   exitFound.set(true);
-                   double distanceFromStart = room.getDistanceFromStart();
-                   System.out.println("Found an exit at room " + room);
-                   if (distanceFromStart < shortestDistanceSoFar) {
-                       System.out.println(
-                               "Found new shortest distance at room "
-                                       + room.toString()
-                                       +", new distance: "
-                                       + distanceFromStart
-                       );
-                       shortestDistanceSoFar = distanceFromStart;
-                   }
-               }
-           }
-           if (room.corridors() == null ||
-                   room.getDistanceFromStart() >= shortestDistanceSoFar ||
-                   room.isExit()) {
-               return;
-           }
-           for (RoomInterface corridor : room.corridors()) {
-               this.room = corridor;
-                   if (threadsUsed.get() < maxThreads.get()) {
-                       synchronized (threadsUsedLock) {
-                           new Thread(new CorridorExplorer(corridor)).start();
-                           threadsUsed.set(threadsUsed.get() + 1);
-                       }
-                   } else {
-                       explore();
-                   }
-               }
+            synchronized (exitFoundLock) {
+                if (room.isExit()) {
+                    exitFound.set(true);
+                    double distanceFromStart = room.getDistanceFromStart();
+                    System.out.println("Found an exit at room " + room);
+                    if (distanceFromStart < shortestDistanceSoFar) {
+                        System.out.println(
+                                "Found new shortest distance at room "
+                                        + room.toString()
+                                        + ", new distance: "
+                                        + distanceFromStart
+                        );
+                        shortestDistanceSoFar = distanceFromStart;
+                    }
+                }
+            }
+            System.out.println(room.toString());
+            if (room.corridors() == null ||
+                    room.getDistanceFromStart() >= shortestDistanceSoFar ||
+                    room.isExit()) {
+                return;
+            }
+            for (RoomInterface corridor : room.corridors()) {
+                this.room = corridor;
+                boolean useNewThread = false;
+                synchronized (threadsUsedLock) {
+                    if (threadsUsed.get() < maxThreads.get()) {
+                        useNewThread = true;
+                        threadsUsed.set(threadsUsed.get() + 1);
+                    }
+                }
+
+                if (useNewThread) {
+                    new Thread(new CorridorExplorer(corridor)).start();
+                } else {
+                    explore();
+                }
+            }
         }
 
         @Override
