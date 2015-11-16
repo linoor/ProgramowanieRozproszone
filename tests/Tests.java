@@ -7,7 +7,7 @@ public class Tests {
 
     @Test
     public void testQueueSystem() {
-        SystemInterface system = new System();
+        System system = new System();
         system.setNumberOfQueues(4);
         system.setThreadsLimit(new int[] {
           2, 3, 1, 2
