@@ -1,7 +1,7 @@
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by linoor on 11/13/15.
@@ -17,7 +17,7 @@ public class System implements SystemInterface {
     private int lastTaskId = -1;
 
     public void finish() {
-        Arrays.stream(queuesManagers).forEach(QueueManager::shutdown);
+        Arrays.stream(queuesManagers).forEach(QueueManager::awaitTermination);
     }
 
     @Override
@@ -39,7 +39,6 @@ public class System implements SystemInterface {
         for (int i = 0; i < maximumThreadsPerQueue.length; i++) {
             queuesManagers[i].setExecutors(maximumThreadsPerQueue[i]);
         }
-        Arrays.stream(queuesManagers).forEach(q -> java.lang.System.out.println(q.queueExecutors));
     }
 
     @Override
@@ -59,8 +58,6 @@ public class System implements SystemInterface {
 
         private int queueNum;
 
-        private TaskInterface taskToRun;
-
         private ExecutorService queueExecutors = Executors.newSingleThreadExecutor();
 
         public QueueManager(int queueNum) {
@@ -71,32 +68,42 @@ public class System implements SystemInterface {
             queueExecutors = Executors.newFixedThreadPool(numOfThreads);
         }
 
-        public void shutdown() {
-           queueExecutors.shutdown();
+        public void awaitTermination() {
+            try {
+                queueExecutors.awaitTermination(3, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void run() {
-            java.lang.System.out.println("Starting a new QueueManager");
             while (true) {
+                final TaskInterface[] taskToRun = {null};
                 synchronized (tasksWaiting.get(queueNum)) {
                     synchronized (tasksInProgress.get(queueNum)) {
                         if (tasksWaiting.get(queueNum).peek() != null) {
-                            taskToRun = tasksWaiting.get(queueNum).remove();
-                            tasksInProgress.get(queueNum).add(taskToRun);
-                            java.lang.System.out.println(String.format("Task %d in progress!", taskToRun.getTaskID()));
+                            taskToRun[0] = tasksWaiting.get(queueNum).remove();
+                            tasksInProgress.get(queueNum).add(taskToRun[0]);
+                            java.lang.System.out.println(String.format("" +
+                                    "Queue %d Task %d in progress!",
+                                    queueNum, taskToRun[0].getTaskID()));
                         }
                     }
                 }
-                if (taskToRun != null) {
+                if (taskToRun[0] != null) {
                     queueExecutors.submit(() -> {
-                        java.lang.System.out.println(String.format("Task %d working!", taskToRun.getTaskID()));
-                        taskToRun.work(queueNum);
-                        tasksInProgress.get(queueNum).remove(taskToRun);
-                        if (taskToRun.getLastQueue() != queueNum) {
-                            tasksWaiting.get(queueNum + 1).add(taskToRun);
+                        java.lang.System.out.println(String.format("Queue %d Task %d working!", queueNum, taskToRun[0].getTaskID()));
+                        TaskInterface result = taskToRun[0].work(queueNum);
+                        tasksInProgress.get(queueNum).remove(taskToRun[0]);
+                        if (taskToRun[0].getLastQueue() != queueNum) {
+                            java.lang.System.out.println(String.format(
+                                    "Task %d moved from %d to %d!",
+                                            taskToRun[0].getTaskID(), queueNum, queueNum+1)
+                            );
+                            tasksWaiting.get(queueNum + 1).add(result);
                         } else {
-                            java.lang.System.out.println(String.format("Task %d finished!", taskToRun.getTaskID()));
+                            java.lang.System.out.println(String.format("Task %d FINISHED!", taskToRun[0].getTaskID()));
                         }
                     });
                 }

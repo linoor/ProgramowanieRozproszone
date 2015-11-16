@@ -15,6 +15,6 @@ public class Tests {
         system.addTask(new Task(0, 3 , 2, true));
         system.addTask(new Task(0, 2 , 1, true));
         system.addTask(new Task(1, 1 , 3, false));
-//        system.finish();
+        system.finish();
     }
 }
