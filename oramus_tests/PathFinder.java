@@ -9,11 +9,11 @@ class PathFinder implements PathFinderInterface {
 
     private static final AtomicInteger maxThreads = new AtomicInteger();
     private static final AtomicInteger threadsUsed = new AtomicInteger();
-    private static final AtomicBoolean exitFound = new AtomicBoolean(false);
-    private static double shortestDistanceSoFar = Double.MAX_VALUE;
-    private static Optional<Runnable> observer = Optional.empty();
-    private static Object exitFoundLock = new Object();
-    private static Object threadsUsedLock = new Object();
+    private final AtomicBoolean exitFound = new AtomicBoolean(false);
+    private double shortestDistanceSoFar = Double.MAX_VALUE;
+    private Optional<Runnable> observer = Optional.empty();
+    private Object exitFoundLock = new Object();
+    private Object threadsUsedLock = new Object();
 
     public PathFinder() {
         threadsUsed.set(0);
