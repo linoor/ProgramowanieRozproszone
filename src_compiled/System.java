@@ -117,18 +117,7 @@ public class System implements SystemInterface {
                 if (taskToRun[0] != null) {
                     queueExecutors.submit(() -> {
 
-                        if (queueNum == taskToRun[0].getLastQueue()) {
-                            int previousTaskId = getPreviousTaskId(taskToRun[0]);
-                            boolean previousTaskFinished = tasksFinished
-                                    .stream()
-                                    .map(TaskInterface::getTaskID)
-                                    .anyMatch(id -> id.equals(previousTaskId));
-                            if (!(previousTaskId == -1 || previousTaskFinished)) {
-                                tasksInProgress.get(queueNum).remove(taskToRun[0]);
-                                tasksWaiting.get(queueNum).add(taskToRun[0]);
-                                return;
-                            }
-                        }
+                        if (!checkThatYouCanRunTask(taskToRun[0])) return;
 
                         print(taskToRun[0].getTaskID(), "working!");
                         TaskInterface result = taskToRun[0].work(queueNum);
@@ -143,6 +132,22 @@ public class System implements SystemInterface {
                     });
                 }
             }
+        }
+
+        private boolean checkThatYouCanRunTask(TaskInterface taskToRun) {
+            if (queueNum == taskToRun.getLastQueue()) {
+                int previousTaskId = getPreviousTaskId(taskToRun);
+                boolean previousTaskFinished = tasksFinished
+                        .stream()
+                        .map(TaskInterface::getTaskID)
+                        .anyMatch(id -> id.equals(previousTaskId));
+                if (!(previousTaskId == -1 || previousTaskFinished)) {
+                    tasksInProgress.get(queueNum).remove(taskToRun);
+                    tasksWaiting.get(queueNum).add(taskToRun);
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
