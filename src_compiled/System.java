@@ -61,20 +61,6 @@ public class System implements SystemInterface {
     }
 
     private class QueueManager implements Runnable {
-
-        public final String[] colors = {
-        "\u001B[30m",
-        "\u001B[31m",
-        "\u001B[32m",
-        "\u001B[33m",
-        "\u001B[34;1m",
-        "\u001B[35;1m",
-        "\u001B[36;1m",
-        "\u001B[37;1m"
-        };
-
-        public String ANSI_RESET = "\u001B[0m";
-
         private int queueNum;
 
         private ExecutorService queueExecutors = Executors.newSingleThreadExecutor();
@@ -97,9 +83,9 @@ public class System implements SystemInterface {
 
         public void print(int taskNum, String message) {
             java.lang.System.out.println(
-                    String.format(colors[queueNum] + String.format("Queue %d ", queueNum)
-                            + colors[colors.length-taskNum] + String.format("Task %d: ", taskNum)
-                            + ANSI_RESET + message));
+                    ColorPrint.getColoredString(queueNum, String.format("Queue %d ", queueNum))
+                            + ColorPrint.getColoredString(4+taskNum, String.format("Task %d: ", taskNum))
+                            + message);
         }
 
         @Override
