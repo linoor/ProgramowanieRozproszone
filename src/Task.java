@@ -44,6 +44,6 @@ public class Task implements  TaskInterface {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return this;
+        return new Task(queue+1, lastQueue, taskId, keepOrder);
     }
 }
