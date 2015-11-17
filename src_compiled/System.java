@@ -56,6 +56,10 @@ public class System implements SystemInterface {
         lastTaskId = task.getTaskID();
     }
 
+    private int getPreviousTaskId(TaskInterface task) {
+        return orderOfTasks.get(task.getTaskID());
+    }
+
     private class QueueManager implements Runnable {
 
         public final String[] colors = {
@@ -112,11 +116,25 @@ public class System implements SystemInterface {
                 }
                 if (taskToRun[0] != null) {
                     queueExecutors.submit(() -> {
+
+                        if (queueNum == taskToRun[0].getLastQueue()) {
+                            int previousTaskId = getPreviousTaskId(taskToRun[0]);
+                            boolean previousTaskFinished = tasksFinished
+                                    .stream()
+                                    .map(TaskInterface::getTaskID)
+                                    .anyMatch(id -> id.equals(previousTaskId));
+                            if (!(previousTaskId == -1 || previousTaskFinished)) {
+                                tasksInProgress.get(queueNum).remove(taskToRun[0]);
+                                tasksWaiting.get(queueNum).add(taskToRun[0]);
+                                return;
+                            }
+                        }
+
                         print(taskToRun[0].getTaskID(), "working!");
                         TaskInterface result = taskToRun[0].work(queueNum);
                         tasksInProgress.get(queueNum).remove(taskToRun[0]);
                         if (taskToRun[0].getLastQueue() != queueNum) {
-                            print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum+1));
+                            print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum + 1));
                             tasksWaiting.get(queueNum + 1).add(result);
                         } else {
                             print(taskToRun[0].getTaskID(), "FINISHED!");
