@@ -12,6 +12,7 @@ public class System implements SystemInterface {
 
     private List<PriorityQueue<TaskInterface>> tasksWaiting;
     private List<PriorityQueue<TaskInterface>> tasksInProgress;
+    private List<TaskInterface> tasksFinished;
 
     private Map<Integer, Integer> orderOfTasks = new HashMap<>();
     private int lastTaskId = -1;
@@ -25,6 +26,7 @@ public class System implements SystemInterface {
         queuesManagers = new QueueManager[queuesNum];
         tasksWaiting = new ArrayList<>(queuesNum);
         tasksInProgress = new ArrayList<>(queuesNum);
+        tasksFinished = new ArrayList<>(queuesNum);
         for (int i = 0; i < queuesNum; i++) {
             queuesManagers[i] = new QueueManager(i);
             tasksWaiting.add(i, new PriorityQueue<>(new TaskQueueComparator()));
@@ -118,6 +120,7 @@ public class System implements SystemInterface {
                             tasksWaiting.get(queueNum + 1).add(result);
                         } else {
                             print(taskToRun[0].getTaskID(), "FINISHED!");
+                            tasksFinished.add(taskToRun[0]);
                         }
                     });
                 }
