@@ -98,12 +98,9 @@ public class System implements SystemInterface {
                                 checkThatYouCanRunTask(potentialTask)) {
                             taskToRun[0] = tasksWaiting.get(queueNum).remove();
                             tasksInProgress.get(queueNum).add(taskToRun[0]);
-                            printIfTask(taskToRun[0], 4, "task 4 taken");
                         }
                     }
                 }
-
-                printIfTask(taskToRun[0], 4, "task 4 is not null before submit");
 
                 if (taskToRun[0] == null) {
                     printIfTask(taskToRun[0], 4, "task 4 is null before submit");
@@ -111,12 +108,7 @@ public class System implements SystemInterface {
                 }
 
                 queueExecutors.submit(() -> {
-                    printIfTask(taskToRun[0], 4, "task 4 submitted");
-                    if (taskToRun[0].getTaskID() == 4) {
-                        java.lang.System.out.println();
-                    }
                     print(taskToRun[0].getTaskID(), "working!");
-                    printIfTask(taskToRun[0], 4, "task 4 after working");
                     TaskInterface result = taskToRun[0].work(queueNum);
                     tasksInProgress.get(queueNum).remove(taskToRun[0]);
                     if (taskToRun[0].getLastQueue() != queueNum) {
