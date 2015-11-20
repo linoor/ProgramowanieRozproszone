@@ -136,8 +136,8 @@ public class System implements SystemInterface {
         private boolean checkThatYouCanRunTask(TaskInterface taskToRun) {
             boolean res = true;
             synchronized (tasksFinished) {
-                if (taskToRun.keepOrder()) {
-                    if (queueNum == taskToRun.getLastQueue()) {
+                if (taskToRun.keepOrder()
+                        && queueNum == taskToRun.getLastQueue()) {
                         int previousTaskId = getPreviousTaskId(taskToRun);
                         boolean previousTaskFinished = tasksFinished
                                 .stream()
@@ -146,7 +146,6 @@ public class System implements SystemInterface {
                         if (!(previousTaskId == -1 || previousTaskFinished)) {
                             res = false;
                         }
-                    }
                 } else if (!taskToRun.keepOrder()
                         && tasksWaiting.get(queueNum).stream().anyMatch(TaskInterface::keepOrder)) {
                     res = false;
