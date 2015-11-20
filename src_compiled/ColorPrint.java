@@ -16,6 +16,6 @@ public class ColorPrint {
     public final static String ANSI_RESET = "\u001B[0m";
 
     public static String getColoredString(int colorNum, String s) {
-        return colors[colorNum] + s + ANSI_RESET;
+        return colors[colorNum % colors.length] + s + ANSI_RESET;
     }
 }
