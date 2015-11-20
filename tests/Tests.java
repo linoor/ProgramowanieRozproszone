@@ -17,7 +17,9 @@ public class Tests {
         system.addTask(new Task(2, 3, 3, false));
         try {
             Thread.sleep(2000);
-            system.addTask(new Task(1, 1 , 4, true));
+            system.addTask(new Task(1, 2 , 4, true));
+            Thread.sleep(500);
+            system.addTask(new Task(0, 3 , 5, false));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

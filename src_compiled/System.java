@@ -108,11 +108,10 @@ public class System implements SystemInterface {
                 }
 
                 queueExecutors.submit(() -> {
-                    print(taskToRun[0].getTaskID(), "working!");
+                    print(taskToRun[0].getTaskID(), String.format("working from %d to %d", queueNum, queueNum + 1));
                     TaskInterface result = taskToRun[0].work(queueNum);
                     tasksInProgress.get(queueNum).remove(taskToRun[0]);
                     if (taskToRun[0].getLastQueue() != queueNum) {
-                        print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum + 1));
                         tasksWaiting.get(queueNum + 1).add(result);
                     } else {
                         synchronized (tasksFinished) {

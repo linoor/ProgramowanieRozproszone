@@ -41,7 +41,7 @@ public class Task implements  TaskInterface {
     public TaskInterface work(int queue) {
         for (int i = 0; i < 2; i++) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
