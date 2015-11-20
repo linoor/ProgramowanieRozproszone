@@ -17,7 +17,7 @@ public class System implements SystemInterface {
     private Map<Integer, Integer> orderOfTasks = new HashMap<>();
     private int lastTaskId = -1;
 
-    public void finish() {
+    public void waitForFinish() {
         Arrays.stream(queuesManagers).forEach(QueueManager::awaitTermination);
     }
 

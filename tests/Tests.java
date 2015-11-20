@@ -21,6 +21,6 @@ public class Tests {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        system.finish();
+        system.waitForFinish();
     }
 }
