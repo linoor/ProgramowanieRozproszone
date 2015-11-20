@@ -93,46 +93,74 @@ public class System implements SystemInterface {
                 final TaskInterface[] taskToRun = {null};
                 synchronized (tasksWaiting.get(queueNum)) {
                     synchronized (tasksInProgress.get(queueNum)) {
-                        if (tasksWaiting.get(queueNum).peek() != null) {
+                        TaskInterface potentialTask = tasksWaiting.get(queueNum).peek();
+                        if (potentialTask != null &&
+                                checkThatYouCanRunTask(potentialTask)) {
                             taskToRun[0] = tasksWaiting.get(queueNum).remove();
                             tasksInProgress.get(queueNum).add(taskToRun[0]);
+                            printIfTask(taskToRun[0], 4, "task 4 taken");
                         }
                     }
                 }
-                if (taskToRun[0] != null) {
-                    queueExecutors.submit(() -> {
 
-                        if (!checkThatYouCanRunTask(taskToRun[0])) return;
+                printIfTask(taskToRun[0], 4, "task 4 is not null before submit");
 
-                        print(taskToRun[0].getTaskID(), "working!");
-                        TaskInterface result = taskToRun[0].work(queueNum);
-                        tasksInProgress.get(queueNum).remove(taskToRun[0]);
-                        if (taskToRun[0].getLastQueue() != queueNum) {
-                            print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum + 1));
-                            tasksWaiting.get(queueNum + 1).add(result);
-                        } else {
+                if (taskToRun[0] == null) {
+                    printIfTask(taskToRun[0], 4, "task 4 is null before submit");
+                    continue;
+                }
+
+                queueExecutors.submit(() -> {
+                    printIfTask(taskToRun[0], 4, "task 4 submitted");
+                    if (taskToRun[0].getTaskID() == 4) {
+                        java.lang.System.out.println();
+                    }
+                    print(taskToRun[0].getTaskID(), "working!");
+                    printIfTask(taskToRun[0], 4, "task 4 after working");
+                    TaskInterface result = taskToRun[0].work(queueNum);
+                    tasksInProgress.get(queueNum).remove(taskToRun[0]);
+                    if (taskToRun[0].getLastQueue() != queueNum) {
+                        print(taskToRun[0].getTaskID(), String.format("moved from %d to %d", queueNum, queueNum + 1));
+                        tasksWaiting.get(queueNum + 1).add(result);
+                    } else {
+                        synchronized (tasksFinished) {
                             print(taskToRun[0].getTaskID(), "FINISHED!");
                             tasksFinished.add(taskToRun[0]);
+                            java.lang.System.out.println("Tasks finished: " + tasksFinished.toString());
+                            java.lang.System.out.println("Tasks in progress: " + tasksInProgress.toString());
+                            java.lang.System.out.println("Tasks waiting: " + tasksWaiting.toString());
                         }
-                    });
-                }
+                    }
+                });
+            }
+        }
+
+        private void printIfTask(TaskInterface task, int taskId, String message) {
+            if (task != null && task.getTaskID() == taskId) {
+                java.lang.System.out.println(message);
             }
         }
 
         private boolean checkThatYouCanRunTask(TaskInterface taskToRun) {
-            if (queueNum == taskToRun.getLastQueue()) {
-                int previousTaskId = getPreviousTaskId(taskToRun);
-                boolean previousTaskFinished = tasksFinished
-                        .stream()
-                        .map(TaskInterface::getTaskID)
-                        .anyMatch(id -> id.equals(previousTaskId));
-                if (!(previousTaskId == -1 || previousTaskFinished)) {
-                    tasksInProgress.get(queueNum).remove(taskToRun);
-                    tasksWaiting.get(queueNum).add(taskToRun);
-                    return false;
+            boolean res = true;
+            synchronized (tasksFinished) {
+                if (taskToRun.keepOrder()) {
+                    if (queueNum == taskToRun.getLastQueue()) {
+                        int previousTaskId = getPreviousTaskId(taskToRun);
+                        boolean previousTaskFinished = tasksFinished
+                                .stream()
+                                .map(TaskInterface::getTaskID)
+                                .anyMatch(id -> id.equals(previousTaskId));
+                        if (!(previousTaskId == -1 || previousTaskFinished)) {
+                            res = false;
+                        }
+                    }
+                } else if (!taskToRun.keepOrder()
+                        && tasksWaiting.get(queueNum).stream().anyMatch(TaskInterface::keepOrder)) {
+                    res = false;
                 }
             }
-            return true;
+            return res;
         }
     }
 }
