@@ -39,11 +39,18 @@ public class Task implements  TaskInterface {
 
     @Override
     public TaskInterface work(int queue) {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 2; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return new Task(queue+1, lastQueue, taskId, keepOrder);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(getTaskID());
     }
 }
