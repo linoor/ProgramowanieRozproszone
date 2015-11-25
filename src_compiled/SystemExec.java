@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by linoor on 11/13/15.
  */
-public class System implements SystemInterface {
+class SystemExec implements SystemInterface {
 
     private QueueManager[] queuesManagers;
 
