@@ -1,9 +1,7 @@
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Created by linoor on 10/23/15.
@@ -26,7 +24,8 @@ class PathFinder implements PathFinderInterface {
     }
 
     @Override
-    public void entranceToTheLabyrinth(RoomInterface mi) {
+    public void entranceToTheLabyrinth(RoomInterface entrance) {
+        new Thread(new Explorer(entrance)).start();
     }
 
     @Override
@@ -74,7 +73,6 @@ class PathFinder implements PathFinderInterface {
                     Explorer newRoomExplorer = new Explorer(roomToExplore);
                     // if we have enough threads then we explore in a new thread - if not then we explore in the same thread
                     if (threadsUsed.get() < maxThreads.get()) {
-                        threadsUsed.incrementAndGet();
                         new Thread(newRoomExplorer).start();
                     } else {
                         newRoomExplorer.explore();
@@ -85,7 +83,9 @@ class PathFinder implements PathFinderInterface {
 
         @Override
         public void run() {
+            threadsUsed.incrementAndGet();
             explore();
+            threadsUsed.decrementAndGet();
         }
     }
 }
