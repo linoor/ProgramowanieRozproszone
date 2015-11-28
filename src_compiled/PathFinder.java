@@ -34,7 +34,7 @@ class PathFinder implements PathFinderInterface {
         threadsUsed.decrementAndGet();
         threadsFinished.incrementAndGet();
         while (true) {
-            if (threadsFinished.get() == threadsStarted.get()) {
+            if (threadsFinished.get() == threadsStarted.get() && threadsUsed.get() == 0) {
                 observer.run();
                 return;
             }
