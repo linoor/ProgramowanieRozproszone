@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -8,7 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class PathFinder implements PathFinderInterface {
 
-    private final AtomicInteger maxThreads = new AtomicInteger(0);
+    private int maxThreads = 0;
     private final AtomicInteger threadsUsed = new AtomicInteger(1);
 
     private Runnable observer;
@@ -24,7 +23,9 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void setMaxThreads(int i) {
-        maxThreads.set(i);
+        if (maxThreads == 0) {
+            maxThreads = i;
+        }
     }
 
     @Override
@@ -66,20 +67,20 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
-               if (room.isExit()) {
-                   exitFound.set(true);
-               }
+           if (room.isExit()) {
+               exitFound.set(true);
+           }
 
-                if (room.isExit()) {
-                    double dist = room.getDistanceFromStart();
-                    if (dist < shortestDistanceSoFar.get()) {
-                        shortestDistanceSoFar.set(dist);
-                    }
+            if (room.isExit()) {
+                double dist = room.getDistanceFromStart();
+                if (dist < shortestDistanceSoFar.get()) {
+                    shortestDistanceSoFar.set(dist);
                 }
+            }
 
-                if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
-                    return;
-                }
+            if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
+                return;
+            }
 
             if (room.isExit()) {
                 return;
@@ -90,7 +91,7 @@ class PathFinder implements PathFinderInterface {
             }
 
             for (RoomInterface roomToExplore : room.corridors()) {
-                    if (threadsUsed.get() < maxThreads.get()) {
+                    if (threadsUsed.get() < maxThreads) {
                         threadsUsed.incrementAndGet();
                         new Thread(new Explorer(roomToExplore)).start();
                     } else {
