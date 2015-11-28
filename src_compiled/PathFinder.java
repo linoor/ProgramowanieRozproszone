@@ -2,6 +2,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,7 +23,14 @@ class PathFinder implements PathFinderInterface {
     }
 
     @Override
-    public void entranceToTheLabyrinth(RoomInterface mi) {
+    public void entranceToTheLabyrinth(RoomInterface entrance) {
+        executor.submit(new CorridorExplorer(entrance));
+        try {
+            executor.awaitTermination(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        observer.run();
     }
 
     @Override
@@ -38,5 +46,39 @@ class PathFinder implements PathFinderInterface {
     @Override
     public double getShortestDistanceToExit() {
         return shortestDistanceSoFar.get();
+    }
+
+    private class CorridorExplorer implements Runnable {
+
+        private RoomInterface room;
+
+        public CorridorExplorer(RoomInterface room) {
+           this.room = room;
+        }
+
+        @Override
+        public void run() {
+            boolean exit = false;
+            synchronized (exitFound) {
+                if (room.isExit()) {
+                    exit = true;
+                    exitFound.set(true);
+                    double dist = room.getDistanceFromStart();
+                    if (dist < getShortestDistanceToExit()) {
+                        shortestDistanceSoFar.set(dist);
+                    }
+                }
+            }
+
+            synchronized (exitFound) {
+                if (room.getDistanceFromStart() >= getShortestDistanceToExit() || exit) {
+                    return;
+                }
+            }
+
+            for (RoomInterface newRoom : room.corridors()) {
+               executor.submit(new CorridorExplorer(newRoom));
+            }
+        }
     }
 }
