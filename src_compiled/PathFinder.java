@@ -16,6 +16,9 @@ class PathFinder implements PathFinderInterface {
     private AtomicBoolean exitFound = new AtomicBoolean(false);
     private AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
 
+    private AtomicInteger threadsStarted = new AtomicInteger(0);
+    private AtomicInteger threadsFinished = new AtomicInteger(0);
+
     private final Object lock = new Object();
 
     @Override
@@ -25,7 +28,17 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void entranceToTheLabyrinth(RoomInterface entrance) {
-        new Thread(new Explorer(entrance)).start();
+        threadsUsed.incrementAndGet();
+        threadsStarted.incrementAndGet();
+        new Explorer(entrance).explore();
+        threadsUsed.decrementAndGet();
+        threadsFinished.incrementAndGet();
+        while (true) {
+            if (threadsStarted.get() == threadsFinished.get()) {
+                observer.run();
+                return;
+            }
+        }
     }
 
     @Override
@@ -52,40 +65,22 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
-            synchronized (lock) {
-                if (room.isExit()) {
-                    exitFound.set(true);
-                    double dist = room.getDistanceFromStart();
-                    if (dist < shortestDistanceSoFar.get()) {
-                        shortestDistanceSoFar.set(dist);
-                    }
-                }
-            }
 
-            synchronized (lock) {
-                if (room.isExit() || room.corridors() == null || room.getDistanceFromStart() > shortestDistanceSoFar.get()) {
-                    return;
-                }
-            }
-
-            synchronized (threadsUsed) {
+            if (room.corridors() != null) {
                 Arrays.stream(room.corridors()).forEach(roomToExplore -> {
-                    Explorer newRoomExplorer = new Explorer(roomToExplore);
-                    // if we have enough threads then we explore in a new thread - if not then we explore in the same thread
-                    if (threadsUsed.get() < maxThreads.get()) {
-                        new Thread(newRoomExplorer).start();
-                    } else {
-                        newRoomExplorer.explore();
-                    }
+                    new Thread(new Explorer(roomToExplore)).start();
                 });
             }
+
         }
 
         @Override
         public void run() {
             threadsUsed.incrementAndGet();
+            threadsStarted.incrementAndGet();
             explore();
             threadsUsed.decrementAndGet();
+            threadsFinished.incrementAndGet();
         }
     }
 }
