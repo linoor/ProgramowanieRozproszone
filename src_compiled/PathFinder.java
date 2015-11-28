@@ -7,13 +7,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class PathFinder implements PathFinderInterface {
 
-    private static final AtomicInteger maxThreads = new AtomicInteger();
-    private static final AtomicInteger threadsUsed = new AtomicInteger();
+    private final AtomicInteger maxThreads = new AtomicInteger();
+    private final AtomicInteger threadsUsed = new AtomicInteger();
     private final AtomicBoolean exitFound = new AtomicBoolean(false);
     private double shortestDistanceSoFar = Double.MAX_VALUE;
     private Optional<Runnable> observer = Optional.empty();
-    private Object exitFoundLock = new Object();
-    private Object threadsUsedLock = new Object();
 
     public PathFinder() {
         threadsUsed.set(0);
@@ -22,7 +20,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public void setMaxThreads(int i) {
-        maxThreads.getAndSet(i);
+        maxThreads.set(i);
     }
 
     @Override
@@ -44,7 +42,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public double getShortestDistanceToExit() {
-        synchronized (exitFoundLock) {
+        synchronized (exitFound) {
             return shortestDistanceSoFar;
         }
     }
@@ -58,7 +56,7 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
-            synchronized (exitFoundLock) {
+            synchronized (exitFound) {
                 if (room.isExit()) {
                     exitFound.set(true);
                     double distanceFromStart = room.getDistanceFromStart();
@@ -67,15 +65,17 @@ class PathFinder implements PathFinderInterface {
                     }
                 }
             }
-            if (room.corridors() == null ||
-                    room.getDistanceFromStart() >= shortestDistanceSoFar ||
-                    room.isExit()) {
-                return;
+            synchronized (exitFound) {
+                if (room.corridors() == null ||
+                                room.getDistanceFromStart() >= shortestDistanceSoFar ||
+                                room.isExit()) {
+                    return;
+                }
             }
             for (RoomInterface corridor : room.corridors()) {
                 this.room = corridor;
                 boolean useNewThread = false;
-                synchronized (threadsUsedLock) {
+                synchronized (threadsUsed) {
                     if (threadsUsed.get() < maxThreads.get()) {
                         useNewThread = true;
                         threadsUsed.set(threadsUsed.get() + 1);
@@ -93,7 +93,9 @@ class PathFinder implements PathFinderInterface {
         @Override
         public void run() {
             explore();
-            threadsUsed.set(threadsUsed.get()-1);
+            synchronized (threadsUsed) {
+                threadsUsed.set(threadsUsed.get()-1);
+            }
         }
     }
 }
