@@ -2,6 +2,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,10 +26,17 @@ class PathFinder implements PathFinderInterface {
     @Override
     public void entranceToTheLabyrinth(RoomInterface entrance) {
         executor.submit(new CorridorExplorer(entrance));
-        try {
-            executor.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (!executor.isTerminated()) {
+            if (!executor.isShutdown()) {
+                try {
+                    Thread.sleep(1000);
+                    if (((ThreadPoolExecutor) executor).getActiveCount() == 0) {
+                        executor.shutdown();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         observer.run();
     }
