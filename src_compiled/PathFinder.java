@@ -1,49 +1,37 @@
-import java.util.DoubleSummaryStatistics;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Created by linoor on 10/23/15.
  */
 class PathFinder implements PathFinderInterface {
 
+    private final AtomicInteger maxThreads = new AtomicInteger(0);
+    private final AtomicInteger threadsUsed = new AtomicInteger(0);
+
     private Runnable observer;
-    private final AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
-    private final AtomicBoolean exitFound = new AtomicBoolean(false);
-    private ExecutorService executor;
+
+    private AtomicBoolean exitFound = new AtomicBoolean(false);
+    private AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
+
+    private final Object lock = new Object();
 
     @Override
     public void setMaxThreads(int i) {
-        executor = Executors.newFixedThreadPool(i);
+        maxThreads.set(i);
     }
 
     @Override
-    public void entranceToTheLabyrinth(RoomInterface entrance) {
-        executor.submit(new CorridorExplorer(entrance));
-        while (!executor.isTerminated()) {
-            if (!executor.isShutdown()) {
-                try {
-                    Thread.sleep(1000);
-                    if (((ThreadPoolExecutor) executor).getActiveCount() == 0) {
-                        executor.shutdown();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        observer.run();
+    public void entranceToTheLabyrinth(RoomInterface mi) {
     }
 
     @Override
     public void registerObserver(Runnable code) {
-       observer = code;
+        observer = code;
     }
 
     @Override
@@ -56,37 +44,48 @@ class PathFinder implements PathFinderInterface {
         return shortestDistanceSoFar.get();
     }
 
-    private class CorridorExplorer implements Runnable {
+    private class Explorer implements Runnable {
 
         private RoomInterface room;
 
-        public CorridorExplorer(RoomInterface room) {
-           this.room = room;
+        public Explorer(RoomInterface room) {
+            this.room = room;
         }
 
-        @Override
-        public void run() {
-            boolean exit = false;
-            synchronized (exitFound) {
+        public void explore() {
+            synchronized (lock) {
                 if (room.isExit()) {
-                    exit = true;
                     exitFound.set(true);
                     double dist = room.getDistanceFromStart();
-                    if (dist < getShortestDistanceToExit()) {
+                    if (dist < shortestDistanceSoFar.get()) {
                         shortestDistanceSoFar.set(dist);
                     }
                 }
             }
 
-            synchronized (exitFound) {
-                if (room.getDistanceFromStart() >= getShortestDistanceToExit() || exit) {
+            synchronized (lock) {
+                if (room.isExit() || room.corridors() == null || room.getDistanceFromStart() > shortestDistanceSoFar.get()) {
                     return;
                 }
             }
 
-            for (RoomInterface newRoom : room.corridors()) {
-               executor.submit(new CorridorExplorer(newRoom));
+            synchronized (threadsUsed) {
+                Arrays.stream(room.corridors()).forEach(roomToExplore -> {
+                    Explorer newRoomExplorer = new Explorer(roomToExplore);
+                    // if we have enough threads then we explore in a new thread - if not then we explore in the same thread
+                    if (threadsUsed.get() < maxThreads.get()) {
+                        threadsUsed.incrementAndGet();
+                        new Thread(newRoomExplorer).start();
+                    } else {
+                        newRoomExplorer.explore();
+                    }
+                });
             }
+        }
+
+        @Override
+        public void run() {
+            explore();
         }
     }
 }
