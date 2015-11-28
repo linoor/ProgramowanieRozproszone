@@ -52,7 +52,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public double getShortestDistanceToExit() {
-        synchronized (exitLock) {
+        synchronized (shortestDistanceSoFar) {
             return shortestDistanceSoFar.get();
         }
     }
@@ -66,6 +66,37 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
+               if (room.isExit()) {
+                   exitFound.set(true);
+               }
+
+                if (room.isExit()) {
+                    double dist = room.getDistanceFromStart();
+                    if (dist < shortestDistanceSoFar.get()) {
+                        shortestDistanceSoFar.set(dist);
+                    }
+                }
+
+                if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
+                    return;
+                }
+
+            if (room.isExit()) {
+                return;
+            }
+
+            if (room.corridors() == null) {
+                return;
+            }
+
+            for (RoomInterface roomToExplore : room.corridors()) {
+                    if (threadsUsed.get() < maxThreads.get()) {
+                        threadsUsed.incrementAndGet();
+                        new Thread(new Explorer(roomToExplore)).start();
+                    } else {
+                        new Explorer(roomToExplore).explore();
+                    }
+            }
         }
 
         @Override

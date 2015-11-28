@@ -158,7 +158,7 @@ public class PMO_StartTest {
 		// testy powtarzane sa 3x
 		for (int i = 0; i < 1; i++) {
 			// test od 2 do 5-ciu watkow
-			for (int j = 5; j < 6; j++)
+			for (int j = 2; j < 6; j++)
 				time.put(j, test(j));
 		}
 
