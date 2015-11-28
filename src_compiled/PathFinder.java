@@ -13,6 +13,7 @@ class PathFinder implements PathFinderInterface {
 
     private Runnable observer;
     private final AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
+    private final AtomicBoolean exitFound = new AtomicBoolean(false);
     private ExecutorService executor;
 
     @Override
@@ -31,7 +32,7 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public boolean exitFound() {
-        return false;
+        return exitFound.get();
     }
 
     @Override
