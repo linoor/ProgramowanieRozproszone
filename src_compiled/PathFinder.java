@@ -48,7 +48,9 @@ class PathFinder implements PathFinderInterface {
 
     @Override
     public boolean exitFound() {
-        return exitFound.get();
+        synchronized (exitFound) {
+            return exitFound.get();
+        }
     }
 
     @Override
@@ -67,22 +69,23 @@ class PathFinder implements PathFinderInterface {
         }
 
         public void explore() {
-           if (room.isExit()) {
-               exitFound.set(true);
-           }
-
-            if (room.isExit()) {
-                double dist = room.getDistanceFromStart();
-                if (dist < shortestDistanceSoFar.get()) {
-                    shortestDistanceSoFar.set(dist);
+            if (!exitFound.get()) {
+                synchronized (exitFound) {
+                    if (room.isExit()) exitFound.set(true);
                 }
             }
 
-            if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
+            if (room.isExit()) {
+                synchronized (shortestDistanceSoFar) {
+                    double dist = room.getDistanceFromStart();
+                    if (dist < shortestDistanceSoFar.get()) {
+                        shortestDistanceSoFar.set(dist);
+                    }
+                }
                 return;
             }
 
-            if (room.isExit()) {
+            if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
                 return;
             }
 
@@ -91,11 +94,11 @@ class PathFinder implements PathFinderInterface {
             }
 
             for (RoomInterface roomToExplore : room.corridors()) {
-                    if (threadsUsed.get() < maxThreads) {
-                        threadsUsed.incrementAndGet();
-                        new Thread(new Explorer(roomToExplore)).start();
-                    } else {
+                    if (threadsUsed.incrementAndGet() > maxThreads) {
+                        threadsUsed.decrementAndGet();
                         new Explorer(roomToExplore).explore();
+                    } else {
+                        new Thread(new Explorer(roomToExplore)).start();
                     }
             }
         }
