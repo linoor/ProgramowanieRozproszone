@@ -62,19 +62,11 @@ class PathFinder implements PathFinderInterface {
                 if (room.isExit()) {
                     exitFound.set(true);
                     double distanceFromStart = room.getDistanceFromStart();
-                    System.out.println("Found an exit at room " + room);
                     if (distanceFromStart < shortestDistanceSoFar) {
-                        System.out.println(
-                                "Found new shortest distance at room "
-                                        + room.toString()
-                                        + ", new distance: "
-                                        + distanceFromStart
-                        );
                         shortestDistanceSoFar = distanceFromStart;
                     }
                 }
             }
-            System.out.println(room.toString());
             if (room.corridors() == null ||
                     room.getDistanceFromStart() >= shortestDistanceSoFar ||
                     room.isExit()) {
@@ -100,7 +92,6 @@ class PathFinder implements PathFinderInterface {
 
         @Override
         public void run() {
-            System.out.println("USING A THREAD NUMBER OF THREADS " + threadsUsed.get());
             explore();
             threadsUsed.set(threadsUsed.get()-1);
         }
