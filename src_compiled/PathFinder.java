@@ -86,9 +86,9 @@ class PathFinder implements PathFinderInterface {
                 return;
             }
 
-//            if (room.getDistanceFromStart() >= getShortestDistanceToExit()) {
-//                return;
-//            }
+            if (room.getDistanceFromStart() >= getShortestDistanceToExit()) {
+                return;
+            }
 
             if (room.corridors() == null) {
                 return;
@@ -102,7 +102,6 @@ class PathFinder implements PathFinderInterface {
                     new Thread(new Explorer(roomToExplore)).start();
                 }
             });
-
         }
 
         @Override
