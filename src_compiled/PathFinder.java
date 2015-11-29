@@ -13,7 +13,7 @@ class PathFinder implements PathFinderInterface {
     private Runnable observer;
 
     private AtomicBoolean exitFound = new AtomicBoolean(false);
-    private AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
+    private final AtomicReference<Double> shortestDistanceSoFar = new AtomicReference<>(Double.MAX_VALUE);
 
     private AtomicInteger threadsStarted = new AtomicInteger(1);
     private AtomicInteger threadsFinished = new AtomicInteger(0);
@@ -78,16 +78,16 @@ class PathFinder implements PathFinderInterface {
             if (room.isExit()) {
                 synchronized (shortestDistanceSoFar) {
                     double dist = room.getDistanceFromStart();
-                    if (dist < shortestDistanceSoFar.get()) {
+                    if (dist < getShortestDistanceToExit()) {
                         shortestDistanceSoFar.set(dist);
                     }
                 }
                 return;
             }
 
-            if (room.getDistanceFromStart() >= shortestDistanceSoFar.get()) {
-                return;
-            }
+//            if (room.getDistanceFromStart() >= getShortestDistanceToExit()) {
+//                return;
+//            }
 
             if (room.corridors() == null) {
                 return;
