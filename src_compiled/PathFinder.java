@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -93,14 +94,15 @@ class PathFinder implements PathFinderInterface {
                 return;
             }
 
-            for (RoomInterface roomToExplore : room.corridors()) {
-                    if (threadsUsed.incrementAndGet() > maxThreads) {
-                        threadsUsed.decrementAndGet();
-                        new Explorer(roomToExplore).explore();
-                    } else {
-                        new Thread(new Explorer(roomToExplore)).start();
-                    }
-            }
+            Arrays.stream(room.corridors()).forEach(roomToExplore -> {
+                if (threadsUsed.incrementAndGet() > maxThreads) {
+                    threadsUsed.decrementAndGet();
+                    new Explorer(roomToExplore).explore();
+                } else {
+                    new Thread(new Explorer(roomToExplore)).start();
+                }
+            });
+
         }
 
         @Override
