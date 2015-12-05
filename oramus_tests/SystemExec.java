@@ -103,23 +103,17 @@ class SystemExec implements SystemInterface {
                 }
 
                 if (taskToRun[0] == null) {
-                    printIfTask(taskToRun[0], 4, "task 4 is null before submit");
                     continue;
                 }
 
                 queueExecutors.submit(() -> {
-                    print(taskToRun[0].getTaskID(), String.format("working from %d to %d", queueNum, queueNum + 1));
                     TaskInterface result = taskToRun[0].work(queueNum);
                     tasksInProgress.get(queueNum).remove(taskToRun[0]);
                     if (taskToRun[0].getLastQueue() != queueNum) {
                         tasksWaiting.get(queueNum + 1).add(result);
                     } else {
                         synchronized (tasksFinished) {
-                            print(taskToRun[0].getTaskID(), "FINISHED!");
                             tasksFinished.add(taskToRun[0]);
-                            java.lang.System.out.println("Tasks finished: " + tasksFinished.toString());
-                            java.lang.System.out.println("Tasks in progress: " + tasksInProgress.toString());
-                            java.lang.System.out.println("Tasks waiting: " + tasksWaiting.toString());
                         }
                     }
                 });
@@ -128,7 +122,6 @@ class SystemExec implements SystemInterface {
 
         private void printIfTask(TaskInterface task, int taskId, String message) {
             if (task != null && task.getTaskID() == taskId) {
-                java.lang.System.out.println(message);
             }
         }
 
