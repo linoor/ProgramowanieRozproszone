@@ -80,13 +80,6 @@ class SystemExec implements SystemInterface {
             }
         }
 
-        public void print(int taskNum, String message) {
-            java.lang.System.out.println(
-                    ColorPrint.getColoredString(queueNum, String.format("Queue %d ", queueNum))
-                            + ColorPrint.getColoredString(4+taskNum, String.format("Task %d: ", taskNum))
-                            + message);
-        }
-
         @Override
         public void run() {
             while (true) {
@@ -117,11 +110,6 @@ class SystemExec implements SystemInterface {
                         }
                     }
                 });
-            }
-        }
-
-        private void printIfTask(TaskInterface task, int taskId, String message) {
-            if (task != null && task.getTaskID() == taskId) {
             }
         }
 
