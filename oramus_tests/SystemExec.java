@@ -126,8 +126,8 @@ class SystemExec implements SystemInterface {
         }
 
         private boolean checkThatYouCanRunTask(TaskInterface taskToRun) {
-            boolean res = true;
             synchronized (tasksFinished) {
+                boolean res = true;
                 if (taskToRun.keepOrder()
                         && queueNum == taskToRun.getLastQueue()) {
                         int previousTaskId = getPreviousTaskId(taskToRun);
@@ -142,8 +142,8 @@ class SystemExec implements SystemInterface {
                         && tasksWaiting.get(queueNum).stream().anyMatch(TaskInterface::keepOrder)) {
                     res = false;
                 }
-            }
             return res;
+            }
         }
     }
 }
