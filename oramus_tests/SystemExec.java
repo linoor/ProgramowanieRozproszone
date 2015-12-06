@@ -17,10 +17,6 @@ class SystemExec implements SystemInterface {
     private Map<Integer, Integer> orderOfTasks = new HashMap<>();
     private int lastTaskId = -1;
 
-    public void waitForFinish() {
-        Arrays.stream(queuesManagers).forEach(QueueManager::awaitTermination);
-    }
-
     @Override
     public void setNumberOfQueues(int queuesNum) {
         queuesManagers = new QueueManager[queuesNum];
@@ -47,7 +43,7 @@ class SystemExec implements SystemInterface {
         if (task.keepOrder()) {
             addTaskOrder(task);
         }
-        tasksWaiting.get(task.getFirstQueue()).add(task);
+            tasksWaiting.get(task.getFirstQueue()).add(task);
     }
 
     private void addTaskOrder(TaskInterface task) {
@@ -72,25 +68,11 @@ class SystemExec implements SystemInterface {
             queueExecutors = Executors.newFixedThreadPool(numOfThreads);
         }
 
-        public void awaitTermination() {
-            try {
-                queueExecutors.awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void print(int taskNum, String message) {
-            java.lang.System.out.println(
-                    ColorPrint.getColoredString(queueNum, String.format("Queue %d ", queueNum))
-                            + ColorPrint.getColoredString(4+taskNum, String.format("Task %d: ", taskNum))
-                            + message);
-        }
-
         @Override
         public void run() {
             while (true) {
                 final TaskInterface[] taskToRun = {null};
+
                 synchronized (tasksWaiting.get(queueNum)) {
                     synchronized (tasksInProgress.get(queueNum)) {
                         TaskInterface potentialTask = tasksWaiting.get(queueNum).peek();
@@ -100,28 +82,23 @@ class SystemExec implements SystemInterface {
                             tasksInProgress.get(queueNum).add(taskToRun[0]);
                         }
                     }
-                }
 
-                if (taskToRun[0] == null) {
-                    continue;
-                }
-
-                queueExecutors.submit(() -> {
-                    TaskInterface result = taskToRun[0].work(queueNum);
-                    tasksInProgress.get(queueNum).remove(taskToRun[0]);
-                    if (taskToRun[0].getLastQueue() != queueNum) {
-                        tasksWaiting.get(queueNum + 1).add(result);
-                    } else {
-                        synchronized (tasksFinished) {
-                            tasksFinished.add(taskToRun[0]);
-                        }
+                    if (taskToRun[0] == null) {
+                        continue;
                     }
-                });
-            }
-        }
 
-        private void printIfTask(TaskInterface task, int taskId, String message) {
-            if (task != null && task.getTaskID() == taskId) {
+                    queueExecutors.submit(() -> {
+                        TaskInterface result = taskToRun[0].work(queueNum);
+                        tasksInProgress.get(queueNum).remove(taskToRun[0]);
+                        if (taskToRun[0].getLastQueue() != queueNum) {
+                            tasksWaiting.get(queueNum + 1).add(result);
+                        } else {
+                            synchronized (tasksFinished) {
+                                tasksFinished.add(taskToRun[0]);
+                            }
+                        }
+                    });
+                }
             }
         }
 
