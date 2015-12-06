@@ -10,7 +10,7 @@ class SystemExec implements SystemInterface {
     private final List<QueueManager> queueManagers         = new ArrayList<>();
     private final List<Queue<TaskInterface>> waitingQueues = new ArrayList<>();
     private final Map<Integer, Integer> taskOrder = new HashMap<>();
-    private final List<TaskInterface> tasksFinished        = new ArrayList<>();
+    private final List<Integer> tasksFinished        = new ArrayList<>();
 
     private int lastTask = -1;
 
@@ -70,11 +70,14 @@ class SystemExec implements SystemInterface {
                         continue;
                     }
                     executor.submit(() -> {
-								System.out.println(String.format("Running task nr %d from queue %d to queue %d, it should finish at the queue %d",
-                                        task.getTaskID(),
-                                        queueNum,
-                                        queueNum + 1,
-                                        task.getLastQueue()));
+                        // if previous task not yet finished, add the task back to the queue
+                        synchronized (waitingQueues.get(queueNum)) {
+                            if (task.getLastQueue() == queueNum && !previousTaskFinished(task)) {
+                                waitingQueues.get(queueNum).add(task);
+                                return;
+                            }
+                        }
+
                         TaskInterface returnedTask = workDatTask(task);
                         if (returnedTask.getLastQueue() == queueNum) {
                             finishIt(returnedTask);
@@ -86,8 +89,15 @@ class SystemExec implements SystemInterface {
             }
         }
 
+        private boolean previousTaskFinished(TaskInterface task) {
+            if (taskOrder.get(task.getTaskID()) == -1) {
+                return true;
+            }
+            return tasksFinished.contains(taskOrder.get(task.getTaskID()));
+        }
+
         private void finishIt(TaskInterface task) {
-            tasksFinished.add(task);
+            tasksFinished.add(task.getTaskID());
             System.out.println("Task " + task.getTaskID() + " FINISHED");
         }
 
@@ -97,6 +107,7 @@ class SystemExec implements SystemInterface {
 
         private void putItInTheNextQueue(TaskInterface task) {
             synchronized (waitingQueues.get(queueNum+1)) {
+                System.out.println(String.format("Moving task %d from queue %d to queue %d", task.getTaskID(), queueNum, queueNum + 1));
                 waitingQueues.get(queueNum+1).add(task);
             }
         }

@@ -12,6 +12,8 @@ class SystemExec implements SystemInterface {
     private final Map<Integer, Integer> taskOrder = new HashMap<>();
     private final List<TaskInterface> tasksFinished        = new ArrayList<>();
 
+    private int lastTask = -1;
+
     @Override
     public void setNumberOfQueues(int queues) {
         System.out.println("setting number of queues " + queues);
@@ -34,9 +36,15 @@ class SystemExec implements SystemInterface {
     @Override
     public void addTask(TaskInterface task) {
         synchronized (waitingQueues.get(task.getFirstQueue())) {
+            setupOrder(task);
             waitingQueues.get(task.getFirstQueue()).add(task);
         }
         System.out.println(waitingQueues);
+    }
+
+    private void setupOrder(TaskInterface task) {
+        taskOrder.put(task.getTaskID(), lastTask);
+        lastTask = task.getTaskID();
     }
 
     private class QueueManager implements Runnable {
