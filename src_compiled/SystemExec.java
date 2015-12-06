@@ -30,7 +30,9 @@ class SystemExec implements SystemInterface {
 
     @Override
     public void addTask(TaskInterface task) {
-        waitingQueues.get(task.getFirstQueue()).add(task);
+        synchronized (waitingQueues.get(task.getFirstQueue())) {
+            waitingQueues.get(task.getFirstQueue()).add(task);
+        }
         System.out.println(waitingQueues);
     }
 
