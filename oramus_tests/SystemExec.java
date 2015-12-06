@@ -1,5 +1,5 @@
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -7,11 +7,14 @@ import java.util.concurrent.Executors;
  */
 class SystemExec implements SystemInterface {
 
-    private List<QueueManager> queueManagers = new ArrayList<>();
-    private List<Queue<TaskInterface>> waitingQueues = new ArrayList<>();
+    private final List<QueueManager> queueManagers         = new ArrayList<>();
+    private final List<Queue<TaskInterface>> waitingQueues = new ArrayList<>();
+    private final Map<Integer, Integer> taskOrder = new HashMap<>();
+    private final List<TaskInterface> tasksFinished        = new ArrayList<>();
 
     @Override
     public void setNumberOfQueues(int queues) {
+        System.out.println("setting number of queues " + queues);
         for (int i = 0; i < queues; i++) {
             waitingQueues.add(new PriorityQueue<>(new TaskQueueComparator()));
             queueManagers.add(new QueueManager(i));
@@ -38,7 +41,7 @@ class SystemExec implements SystemInterface {
 
     private class QueueManager implements Runnable {
 
-        private Executor executor;
+        private ExecutorService executor = Executors.newFixedThreadPool(1);
         private int queueNum;
 
         public QueueManager(int queueNum) {
@@ -46,34 +49,47 @@ class SystemExec implements SystemInterface {
         }
 
         public void setThreadLimit(int limit) {
+            System.out.println("thread limit set");
             executor = Executors.newFixedThreadPool(limit);
         }
 
         @Override
         public void run() {
             while (true) {
-                if (executor == null) {
-                    continue;
-                }
                 synchronized (waitingQueues.get(queueNum)) {
-                    TaskInterface taskToRun = waitingQueues.get(queueNum).poll();
-                    if (taskToRun == null ) {
+                    TaskInterface task = waitingQueues.get(queueNum).poll();
+                    if (task == null ) {
                         continue;
                     }
-                    System.out.println("got a task to run");
-                    executor.execute(() -> {
-                        System.out.println(String.format("Running task nr %d from queue %d to queue %d", taskToRun.getTaskID(),
-                                queueNum,
-                                queueNum+1));
-                        TaskInterface newTask = taskToRun.work(queueNum);
-                        final int newQueueNum = queueNum + 1;
-                        if (newQueueNum < newTask.getLastQueue()) {
-                            synchronized (waitingQueues.get(newQueueNum)) {
-                                waitingQueues.get(newQueueNum).add(newTask);
-                            }
+                    executor.submit(() -> {
+								System.out.println(String.format("Running task nr %d from queue %d to queue %d, it should finish at the queue %d",
+                                        task.getTaskID(),
+                                        queueNum,
+                                        queueNum + 1,
+                                        task.getLastQueue()));
+                        TaskInterface returnedTask = workDatTask(task);
+                        if (returnedTask.getLastQueue() == queueNum) {
+                            finishIt(returnedTask);
+                        } else {
+                            putItInTheNextQueue(returnedTask);
                         }
                     });
                     }
+            }
+        }
+
+        private void finishIt(TaskInterface task) {
+            tasksFinished.add(task);
+            System.out.println("Task " + task.getTaskID() + " FINISHED");
+        }
+
+        private TaskInterface workDatTask(TaskInterface taskToRun) {
+            return taskToRun.work(queueNum);
+        }
+
+        private void putItInTheNextQueue(TaskInterface task) {
+            synchronized (waitingQueues.get(queueNum+1)) {
+                waitingQueues.get(queueNum+1).add(task);
             }
         }
     }
