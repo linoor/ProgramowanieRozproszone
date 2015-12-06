@@ -13,11 +13,10 @@ class SystemExec implements SystemInterface {
     @Override
     public void setNumberOfQueues(int queues) {
         for (int i = 0; i < queues; i++) {
-            waitingQueues.add(new PriorityQueue<>());
-            QueueManager newQueueManager = new QueueManager(i);
-            queueManagers.add(newQueueManager);
-            new Thread(newQueueManager).start();
+            waitingQueues.add(new PriorityQueue<>(new TaskQueueComparator()));
+            queueManagers.add(new QueueManager(i));
         }
+        queueManagers.stream().forEach(manager -> new Thread(manager).start());
         assert queueManagers.size() == waitingQueues.size();
     }
 
@@ -34,6 +33,7 @@ class SystemExec implements SystemInterface {
         synchronized (waitingQueues.get(task.getFirstQueue())) {
             waitingQueues.get(task.getFirstQueue()).add(task);
         }
+        System.out.println(waitingQueues);
     }
 
     private class QueueManager implements Runnable {
@@ -46,6 +46,7 @@ class SystemExec implements SystemInterface {
         }
 
         public void setThreadLimit(int limit) {
+            System.out.println("thread limit set");
             executor = Executors.newFixedThreadPool(limit);
         }
 
@@ -56,9 +57,24 @@ class SystemExec implements SystemInterface {
                     continue;
                 }
                 synchronized (waitingQueues.get(queueNum)) {
+                    if (waitingQueues.get(queueNum).peek() == null ) {
+                        continue;
+                    }
                     TaskInterface taskToRun = waitingQueues.get(queueNum).remove();
-                    executor.execute();
-                }
+                    System.out.println("got a task to run");
+                    executor.execute(() -> {
+                        System.out.println(String.format("Running task nr %d from queue %d to queue %d", taskToRun.getTaskID(),
+                                queueNum,
+                                queueNum+1));
+                        TaskInterface newTask = taskToRun.work(queueNum);
+                        final int newQueueNum = queueNum + 1;
+                        if (newQueueNum < newTask.getLastQueue()) {
+                            synchronized (waitingQueues.get(newQueueNum)) {
+                                waitingQueues.get(newQueueNum).add(newTask);
+                            }
+                        }
+                    });
+                    }
             }
         }
     }

@@ -23,6 +23,11 @@ public class Tests {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        systemExec.waitForFinish();
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
