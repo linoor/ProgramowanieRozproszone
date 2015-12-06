@@ -30,15 +30,13 @@ class SystemExec implements SystemInterface {
 
     @Override
     public void addTask(TaskInterface task) {
-        synchronized (waitingQueues.get(task.getFirstQueue())) {
-            waitingQueues.get(task.getFirstQueue()).add(task);
-        }
+        waitingQueues.get(task.getFirstQueue()).add(task);
         System.out.println(waitingQueues);
     }
 
     private class QueueManager implements Runnable {
 
-        private ExecutorService executor;
+        private ExecutorService executor = Executors.newFixedThreadPool(1);
         private int queueNum;
 
         public QueueManager(int queueNum) {
@@ -53,15 +51,11 @@ class SystemExec implements SystemInterface {
         @Override
         public void run() {
             while (true) {
-                if (executor == null) {
-                    continue;
-                }
                 synchronized (waitingQueues.get(queueNum)) {
-                    TaskInterface taskToRun = waitingQueues.get(queueNum).peek();
+                    TaskInterface taskToRun = waitingQueues.get(queueNum).poll();
                     if (taskToRun == null ) {
                         continue;
                     }
-                    System.out.println("got a task to run");
                     executor.submit(() -> {
                         System.out.println(String.format("Running task nr %d from queue %d to queue %d", taskToRun.getTaskID(),
                                 queueNum,
