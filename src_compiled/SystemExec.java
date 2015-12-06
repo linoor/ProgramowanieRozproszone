@@ -1,5 +1,5 @@
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -38,7 +38,7 @@ class SystemExec implements SystemInterface {
 
     private class QueueManager implements Runnable {
 
-        private Executor executor;
+        private ExecutorService executor;
         private int queueNum;
 
         public QueueManager(int queueNum) {
@@ -57,15 +57,15 @@ class SystemExec implements SystemInterface {
                     continue;
                 }
                 synchronized (waitingQueues.get(queueNum)) {
-                    if (waitingQueues.get(queueNum).peek() == null ) {
+                    TaskInterface taskToRun = waitingQueues.get(queueNum).peek();
+                    if (taskToRun == null ) {
                         continue;
                     }
-                    TaskInterface taskToRun = waitingQueues.get(queueNum).remove();
                     System.out.println("got a task to run");
-                    executor.execute(() -> {
+                    executor.submit(() -> {
                         System.out.println(String.format("Running task nr %d from queue %d to queue %d", taskToRun.getTaskID(),
                                 queueNum,
-                                queueNum+1));
+                                queueNum + 1));
                         TaskInterface newTask = taskToRun.work(queueNum);
                         final int newQueueNum = queueNum + 1;
                         if (newQueueNum < newTask.getLastQueue()) {
