@@ -75,9 +75,9 @@ class SystemExec implements SystemInterface {
                             }
                         }
 
-                        TaskInterface returnedTask = workDatTask(task);
-                        if (returnedTask.getLastQueue() == queueNum) {
-                            finishIt(returnedTask);
+                        TaskInterface returnedTask = task.work(queueNum);
+                        if (task.getLastQueue() == queueNum) {
+                            finishIt(task);
                         } else {
                             putItInTheNextQueue(returnedTask);
                         }
