@@ -16,7 +16,6 @@ class SystemExec implements SystemInterface {
 
     @Override
     public void setNumberOfQueues(int queues) {
-        System.out.println("setting number of queues " + queues);
         for (int i = 0; i < queues; i++) {
             waitingQueues.add(new PriorityQueue<>(new TaskQueueComparator()));
             queueManagers.add(new QueueManager(i));
@@ -39,7 +38,6 @@ class SystemExec implements SystemInterface {
             setupOrder(task);
             waitingQueues.get(task.getFirstQueue()).add(task);
         }
-        System.out.println(waitingQueues);
     }
 
     private void setupOrder(TaskInterface task) {
@@ -57,7 +55,6 @@ class SystemExec implements SystemInterface {
         }
 
         public void setThreadLimit(int limit) {
-            System.out.println("thread limit set");
             executor = Executors.newFixedThreadPool(limit);
         }
 
@@ -98,16 +95,10 @@ class SystemExec implements SystemInterface {
 
         private void finishIt(TaskInterface task) {
             tasksFinished.add(task.getTaskID());
-            System.out.println("Task " + task.getTaskID() + " FINISHED");
-        }
-
-        private TaskInterface workDatTask(TaskInterface taskToRun) {
-            return taskToRun.work(queueNum);
         }
 
         private void putItInTheNextQueue(TaskInterface task) {
             synchronized (waitingQueues.get(queueNum+1)) {
-                System.out.println(String.format("Moving task %d from queue %d to queue %d", task.getTaskID(), queueNum, queueNum + 1));
                 waitingQueues.get(queueNum+1).add(task);
             }
         }
