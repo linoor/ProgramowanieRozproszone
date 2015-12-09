@@ -1,6 +1,7 @@
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by linoor on 11/13/15.
@@ -11,6 +12,7 @@ class SystemExec implements SystemInterface {
     private final List<Queue<TaskInterface>> waitingQueues = new ArrayList<>();
     private final Map<Integer, Integer> taskOrder = new HashMap<>();
     private final List<Integer> tasksFinished        = new ArrayList<>();
+    private AtomicInteger orderedCounter = new AtomicInteger(0);
 
     private int lastTask = -1;
 
@@ -41,8 +43,11 @@ class SystemExec implements SystemInterface {
     }
 
     private void setupOrder(TaskInterface task) {
-        taskOrder.put(task.getTaskID(), lastTask);
-        lastTask = task.getTaskID();
+        if (task.keepOrder()) {
+            orderedCounter.incrementAndGet();
+            taskOrder.put(task.getTaskID(), lastTask);
+            lastTask = task.getTaskID();
+        }
     }
 
     private class QueueManager implements Runnable {
@@ -67,15 +72,33 @@ class SystemExec implements SystemInterface {
                         continue;
                     }
                     executor.submit(() -> {
-                        // if previous task not yet finished, add the task back to the queue
                         synchronized (waitingQueues.get(queueNum)) {
-                            if (task.getLastQueue() == queueNum && !previousTaskFinished(task)) {
+                            // if the task is ordered and
+                            // the previous task not yet finished, add the task back to the queue
+                            if (task.keepOrder() &&
+                                    task.getLastQueue() == queueNum &&
+                                    !previousTaskFinished(task)) {
+                                waitingQueues.get(queueNum).add(task);
+                                return;
+                            }
+                            // if the task is not ordered
+                            // and there is another ordered task in the queue
+                            else if (!task.keepOrder() &&
+                                    waitingQueues.get(queueNum).stream().anyMatch(TaskInterface::keepOrder)) {
                                 waitingQueues.get(queueNum).add(task);
                                 return;
                             }
                         }
 
+                        synchronized (waitingQueues.get(queueNum)) {
+                            if (!task.keepOrder() && orderedCounter.get() > 0) {
+                                waitingQueues.get(queueNum).add(task);
+                                return;
+                            }
+                        }
                         TaskInterface returnedTask = task.work(queueNum);
+                        // task and not returned task because after the last work
+                        // the returnedTask is null
                         if (task.getLastQueue() == queueNum) {
                             finishIt(task);
                         } else {
@@ -94,6 +117,9 @@ class SystemExec implements SystemInterface {
         }
 
         private void finishIt(TaskInterface task) {
+            if (task.keepOrder()) {
+                orderedCounter.decrementAndGet();
+            }
             tasksFinished.add(task.getTaskID());
         }
 
