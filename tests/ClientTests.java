@@ -29,7 +29,7 @@ public class ClientTests {
             ORB orb = ORB.init(args, null);
 
             // get the root naming context
-            org.omg.CORBA.Object objRef = orb.resolve_initial_references("LINKEXCHANGE");
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
 
             String name = "LINKEXCHANGE";
