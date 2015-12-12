@@ -1,3 +1,4 @@
+import org.omg.CORBA.IntHolder;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
@@ -20,6 +21,11 @@ public class Client {
 
             String name = "LINKEXCHANGE";
             exchangeSystem = LinkExchangeSystemHelper.narrow(ncRef.resolve_str(name));
+
+            IntHolder userId = new IntHolder();
+            exchangeSystem.register("linoor", userId);
+            assert userId.value != -1;
+
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();

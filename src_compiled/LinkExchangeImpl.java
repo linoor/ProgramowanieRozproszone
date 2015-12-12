@@ -3,7 +3,7 @@ import org.omg.CORBA.IntHolder;
 /**
  * Created by linoor on 12/12/15.
  */
-public class Start extends LinkExchangeSystemPOA {
+public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public void register(String username, IntHolder userID) {
