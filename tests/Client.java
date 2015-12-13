@@ -1,6 +1,3 @@
-import junit.framework.TestCase;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.omg.CORBA.IntHolder;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
@@ -11,21 +8,13 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * Created by linoor on 12/12/15.
  */
-public class ClientTests {
+public class Client {
 
     static LinkExchangeSystem exchangeSystem;
 
-    @BeforeClass
-    public static void setUp() {
-        String[] args = new String[0];
-        new Server().main(args);
-    }
-
-    @Test
-    public void testRegisterClient() {
+    public static void main(String[] args) {
         try {
             // create and initialize the ORB
-            String[] args = new String[0];
             ORB orb = ORB.init(args, null);
 
             // get the root naming context
@@ -37,8 +26,8 @@ public class ClientTests {
 
             IntHolder userId = new IntHolder();
             exchangeSystem.register("linoor", userId);
-            assertNotEquals(-1, userId.value);
-
+            assert userId.value != -1;
+            System.out.println("UserId equals: " + userId.value);
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
