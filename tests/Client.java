@@ -153,6 +153,22 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void testRemoveNotExistingLink() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId = new IntHolder();
+        exchangeSystem.register("linoor3", userId);
+
+        IntHolder linkId = new IntHolder();
+        exchangeSystem.addLink(userId.value, "some link", linkId);
+
+        int notExistingIdVal = 1000;
+        boolean ret = exchangeSystem.linkRemove(notExistingIdVal, linkId.value);
+        assert !ret;
+
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -171,6 +187,7 @@ public class Client {
             testAddLink();
 //            testAddLinkWithWrongUser();
             testRemoveLinkIfExisted();
+            testRemoveNotExistingLink();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
