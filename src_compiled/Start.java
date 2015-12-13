@@ -8,7 +8,7 @@ import org.omg.PortableServer.POAHelper;
 /**
  * Created by linoor on 12/12/15.
  */
-public class Server {
+public class Start {
 
     public static void main(String[] args) {
         try {
@@ -30,7 +30,7 @@ public class Server {
             NameComponent path[] = ncRef.to_name(name);
             ncRef.rebind(path, href);
 
-            System.out.println("Server running");
+            System.out.println("Start running");
 
             orb.run();
         } catch (Exception e) {
