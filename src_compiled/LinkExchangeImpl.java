@@ -13,6 +13,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     private ORB orb;
 
     private final static AtomicInteger userIdNum = new AtomicInteger(0);
+    private final static AtomicInteger linkIdNum = new AtomicInteger(0);
 
     private final Map<String, Integer> users = new HashMap<>();
 
@@ -37,7 +38,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public void addLink(int userID, String link, IntHolder linkID) {
-
+        linkID.value = linkIdNum.getAndIncrement();
     }
 
     @Override
@@ -57,5 +58,13 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     public void setOrb(ORB orb) {
         this.orb = orb;
+    }
+    private class Link {
+        public boolean isPrivate = false;
+        public int id = -1;
+
+        public Link(int id) {
+            this.id = id;
+        }
     }
 }
