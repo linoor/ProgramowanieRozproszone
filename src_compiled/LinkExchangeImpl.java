@@ -1,6 +1,8 @@
 import org.omg.CORBA.IntHolder;
 import org.omg.CORBA.ORB;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -10,11 +12,26 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     private ORB orb;
 
-    private static AtomicInteger userIdNum = new AtomicInteger(0);
+    private final static AtomicInteger userIdNum = new AtomicInteger(0);
+
+    private final Map<String, Integer> users = new HashMap<>();
 
     @Override
     public void register(String username, IntHolder userID) {
-        userID.value = userIdNum.getAndIncrement();
+        boolean userExists = false;
+        synchronized (users) {
+            if (users.containsKey(username)) {
+                userExists = true;
+            }
+        }
+        if (!userExists) {
+            userID.value = userIdNum.getAndIncrement();
+            synchronized (users) {
+                users.put(username, userID.value);
+            }
+        } else {
+            userID.value = -1;
+        }
     }
 
     @Override

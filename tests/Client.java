@@ -22,6 +22,17 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void testUserWithExistingNameReturnsMinusOne() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId = new IntHolder();
+        exchangeSystem.register("linoorsame", userId);
+        assert userId.value != -1;
+        exchangeSystem.register("linoorsame", userId);
+        assert userId.value == -1;
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -34,6 +45,7 @@ public class Client {
             String name = "LINKEXCHANGE";
             exchangeSystem = LinkExchangeSystemHelper.narrow(ncRef.resolve_str(name));
             testSimpleRegister();
+            testUserWithExistingNameReturnsMinusOne();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
