@@ -1,6 +1,8 @@
 import org.omg.CORBA.IntHolder;
 import org.omg.CORBA.ORB;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by linoor on 12/12/15.
  */
@@ -8,9 +10,11 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     private ORB orb;
 
+    private static AtomicInteger userIdNum = new AtomicInteger(0);
+
     @Override
     public void register(String username, IntHolder userID) {
-
+        userID.value = userIdNum.getAndIncrement();
     }
 
     @Override

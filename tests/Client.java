@@ -3,14 +3,24 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
-import static org.junit.Assert.assertNotEquals;
-
 /**
  * Created by linoor on 12/12/15.
  */
 public class Client {
 
     static LinkExchangeSystem exchangeSystem;
+
+    public static void testSimpleRegister() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId = new IntHolder();
+        exchangeSystem.register("linoor", userId);
+        assert userId.value == 0;
+
+        exchangeSystem.register("linoorek", userId);
+        assert userId.value == 1;
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
 
     public static void main(String[] args) {
         try {
@@ -23,11 +33,7 @@ public class Client {
 
             String name = "LINKEXCHANGE";
             exchangeSystem = LinkExchangeSystemHelper.narrow(ncRef.resolve_str(name));
-
-            IntHolder userId = new IntHolder();
-            exchangeSystem.register("linoor", userId);
-            assert userId.value != -1;
-            System.out.println("UserId equals: " + userId.value);
+            testSimpleRegister();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();

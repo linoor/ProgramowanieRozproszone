@@ -9,6 +9,7 @@ import org.omg.PortableServer.POAHelper;
  * Created by linoor on 12/12/15.
  */
 public class Server {
+
     public static void main(String[] args) {
         try {
             ORB orb = ORB.init(args, null);
