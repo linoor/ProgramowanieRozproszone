@@ -6,8 +6,8 @@ javac Server.java
 javac Client.java
 
 # starting Server
-java Server -ORBInitialPort 1050 -ORBInitialHost localhost&
+java -ea Server -ORBInitialPort 1050 -ORBInitialHost localhost&
 
 sleep 1
 # starting Client
-java Client -ORBInitialPort 1050 -ORBInitialHost localhost
+java -ea Client -ORBInitialPort 1050 -ORBInitialHost localhost
