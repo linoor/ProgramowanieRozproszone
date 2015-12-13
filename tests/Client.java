@@ -124,6 +124,20 @@ public class Client {
 
         System.out.println(String.format("**** END %s ****", methodName));
     }
+
+    public static void testAddLinkWithWrongUser() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId = new IntHolder();
+        exchangeSystem.register("linoor", userId);
+
+        IntHolder linkId = new IntHolder();
+        exchangeSystem.addLink(10, "some link", linkId);
+        assert linkId.value == -1;
+
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -140,6 +154,7 @@ public class Client {
 //            testMultipleUsersRegisterAtTheSameTime();
 //            testRegisterMultipleUsersWithSameName();
             testAddLink();
+//            testAddLinkWithWrongUser();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();

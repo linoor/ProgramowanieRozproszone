@@ -38,7 +38,15 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public void addLink(int userID, String link, IntHolder linkID) {
-        linkID.value = linkIdNum.getAndIncrement();
+        synchronized (users) {
+            if (users.containsValue(userID)) {
+                System.out.println(String.format("Added link %s to user %d", link, userID));
+                linkID.value = linkIdNum.getAndIncrement();
+            } else {
+                System.out.println(String.format("User %d does not exist", userID));
+                linkID.value = -1;
+            }
+        }
     }
 
     @Override
