@@ -29,6 +29,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
             synchronized (users) {
                 users.put(username, userID.value);
             }
+            System.out.println(String.format("Registered user %s with num %d", username, userID.value));
         } else {
             userID.value = -1;
         }

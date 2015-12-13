@@ -3,6 +3,10 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.CosNaming.NamingContextExtHelper;
 
+import java.util.Arrays;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 /**
  * Created by linoor on 12/12/15.
  */
@@ -33,6 +37,37 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void testMultipleUsersRegisterAtTheSameTime() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        final CyclicBarrier gate = new CyclicBarrier(20+1);
+
+        Thread[] threads = new Thread[20];
+        for (int i = 0; i < threads.length; i++) {
+            final int index = i;
+            threads[i] = new Thread(() -> {
+                try {
+                    gate.await();
+
+                    IntHolder userId = new IntHolder();
+                    exchangeSystem.register("multipleregistertest" + index, userId);
+                    assert userId.value != -1;
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        Arrays.stream(threads).forEach(Thread::start);
+
+        try {
+            gate.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -44,8 +79,9 @@ public class Client {
 
             String name = "LINKEXCHANGE";
             exchangeSystem = LinkExchangeSystemHelper.narrow(ncRef.resolve_str(name));
-            testSimpleRegister();
-            testUserWithExistingNameReturnsMinusOne();
+//            testSimpleRegister();
+//            testUserWithExistingNameReturnsMinusOne();
+            testMultipleUsersRegisterAtTheSameTime();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
