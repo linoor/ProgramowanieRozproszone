@@ -69,7 +69,22 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public boolean publishLink(int userID, int linkID) {
-        return false;
+        synchronized (users) {
+            if (!users.containsValue(userID)) {
+                return false;
+            }
+        }
+        synchronized (links) {
+            if (!links.containsKey(linkID)) {
+                return false;
+            }
+        }
+
+        synchronized (links) {
+            links.get(linkID).publish();
+        }
+
+        return true;
     }
 
     @Override
@@ -99,8 +114,8 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     }
 
     private class Link {
-        private String link = "";
-        private int userID = -1;
+        public String link = "";
+        public int userID = -1;
         public boolean isPrivate = true;
         public int id = -1;
 
@@ -116,6 +131,11 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
         public int getUserID() {
             return userID;
+        }
+
+        public void publish() {
+            System.out.println(String.format("Link %s published!", link));
+            isPrivate = false;
         }
 
         @Override

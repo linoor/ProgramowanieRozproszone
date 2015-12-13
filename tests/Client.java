@@ -202,6 +202,26 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void shouldSeeLinkAfterItIsPublished() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId1 = new IntHolder();
+        exchangeSystem.register("linoor1", userId1);
+        IntHolder linkId = new IntHolder(); exchangeSystem.addLink(userId1.value, "link1", linkId);
+        exchangeSystem.publishLink(userId1.value, linkId.value);
+
+        IntHolder userId2 = new IntHolder();
+        exchangeSystem.register("linoor2", userId2);
+        exchangeSystem.addLink(userId2.value, "link4", new IntHolder());
+        exchangeSystem.addLink(userId2.value, "link5", new IntHolder());
+
+        String[] links = exchangeSystem.getLinks(userId2.value);
+        System.out.println("links: " + Arrays.toString(links));
+        assert Arrays.equals(links, new String[] {"link1", "link4", "link5"});
+
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -223,6 +243,7 @@ public class Client {
 //            testRemoveNotExistingLink();
 //            testGetEmptyIfNoLinks();
 //            testShouldSeeOnlyUsersOrPublicLinks();
+            shouldSeeLinkAfterItIsPublished();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
