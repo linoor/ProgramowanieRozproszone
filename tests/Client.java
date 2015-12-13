@@ -68,6 +68,39 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void testRegisterMultipleUsersWithSameName() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        final CyclicBarrier gate = new CyclicBarrier(20+1);
+
+        Thread[] threads = new Thread[20];
+        for (int i = 0; i < threads.length; i++) {
+            final int index = i;
+            threads[i] = new Thread(() -> {
+                try {
+                    gate.await();
+
+                    IntHolder userId = new IntHolder();
+                    exchangeSystem.register("multipleuserswithsamename", userId);
+                    if (index != 0) {
+                        assert userId.value == -1;
+                    }
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        Arrays.stream(threads).forEach(Thread::start);
+
+        try {
+            gate.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -81,7 +114,8 @@ public class Client {
             exchangeSystem = LinkExchangeSystemHelper.narrow(ncRef.resolve_str(name));
 //            testSimpleRegister();
 //            testUserWithExistingNameReturnsMinusOne();
-            testMultipleUsersRegisterAtTheSameTime();
+//            testMultipleUsersRegisterAtTheSameTime();
+            testRegisterMultipleUsersWithSameName();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
