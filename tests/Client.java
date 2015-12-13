@@ -181,7 +181,7 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
-    public static void testShouldSeeOnlyUsersLinks() {
+    public static void testShouldSeeOnlyUsersOrPublicLinks() {
         String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
         System.out.println(String.format("**** %s ****", methodName));
         IntHolder userId1 = new IntHolder();
@@ -221,8 +221,8 @@ public class Client {
 //            testAddLinkWithWrongUser();
 //            testRemoveLinkIfExisted();
 //            testRemoveNotExistingLink();
-            testGetEmptyIfNoLinks();
-            testShouldSeeOnlyUsersLinks();
+//            testGetEmptyIfNoLinks();
+//            testShouldSeeOnlyUsersOrPublicLinks();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
