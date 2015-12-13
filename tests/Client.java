@@ -6,6 +6,7 @@ import org.omg.CosNaming.NamingContextExtHelper;
 import java.util.Arrays;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by linoor on 12/12/15.
@@ -73,6 +74,8 @@ public class Client {
         System.out.println(String.format("**** %s ****", methodName));
         final CyclicBarrier gate = new CyclicBarrier(20+1);
 
+        final AtomicBoolean after0 = new AtomicBoolean(false);
+
         Thread[] threads = new Thread[20];
         for (int i = 0; i < threads.length; i++) {
             final int index = i;
@@ -82,8 +85,13 @@ public class Client {
 
                     IntHolder userId = new IntHolder();
                     exchangeSystem.register("multipleuserswithsamename", userId);
-                    if (index != 0) {
-                        assert userId.value == -1;
+                    synchronized (after0) {
+                        if (userId.value == 0) {
+                            after0.set(true);
+                            return;
+                        } else {
+                            assert userId.value == -1;
+                        }
                     }
                 } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();

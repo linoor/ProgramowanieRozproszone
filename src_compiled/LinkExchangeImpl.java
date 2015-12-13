@@ -25,8 +25,8 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
             }
         }
         if (!userExists) {
-            userID.value = userIdNum.getAndIncrement();
             synchronized (users) {
+                userID.value = userIdNum.getAndIncrement();
                 users.put(username, userID.value);
             }
             System.out.println(String.format("Registered user %s with num %d", username, userID.value));
