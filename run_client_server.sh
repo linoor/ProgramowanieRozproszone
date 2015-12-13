@@ -2,11 +2,11 @@
 
 cp src/*.java src_compiled/*.java tests/*.java tmp/
 cd tmp
-javac Server.java
+javac Start.java
 javac Client.java
 
-# starting Server
-java -ea Server -ORBInitialPort 1050 -ORBInitialHost localhost&
+# starting Start
+java -ea Start -ORBInitialPort 1050 -ORBInitialHost localhost&
 
 sleep 1
 # starting Client
