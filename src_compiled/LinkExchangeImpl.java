@@ -64,6 +64,11 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
                 return false;
             }
         }
+
+        synchronized (links) {
+            links.remove(linkID);
+        }
+
         return true;
     }
 
