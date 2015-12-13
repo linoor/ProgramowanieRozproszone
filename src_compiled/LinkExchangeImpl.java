@@ -16,6 +16,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     private final static AtomicInteger linkIdNum = new AtomicInteger(0);
 
     private final Map<String, Integer> users = new HashMap<>();
+    private final Map<Integer, Link> links = new HashMap<>();
 
     @Override
     public void register(String username, IntHolder userID) {
@@ -42,6 +43,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
             if (users.containsValue(userID)) {
                 System.out.println(String.format("Added link %s to user %d", link, userID));
                 linkID.value = linkIdNum.getAndIncrement();
+                links.put(linkID.value, new Link(linkID.value, link));
             } else {
                 System.out.println(String.format("User %d does not exist", userID));
                 linkID.value = -1;
@@ -51,7 +53,17 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public boolean linkRemove(int userID, int linkID) {
-        return false;
+        synchronized (users) {
+            if (!users.containsValue(userID)) {
+                return false;
+            }
+        }
+        synchronized (links) {
+            if (!links.containsKey(linkID)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -67,12 +79,18 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     public void setOrb(ORB orb) {
         this.orb = orb;
     }
+
     private class Link {
+        private String link = "";
         public boolean isPrivate = false;
         public int id = -1;
 
-        public Link(int id) {
+        public Link(int id, String link) {
             this.id = id;
+        }
+
+        public String getLink() {
+            return link;
         }
     }
 }
