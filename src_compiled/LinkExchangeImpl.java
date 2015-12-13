@@ -1,8 +1,7 @@
 import org.omg.CORBA.IntHolder;
 import org.omg.CORBA.ORB;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -43,7 +42,9 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
             if (users.containsValue(userID)) {
                 System.out.println(String.format("Added link %s to user %d", link, userID));
                 linkID.value = linkIdNum.getAndIncrement();
-                links.put(linkID.value, new Link(linkID.value, link));
+                links.put(linkID.value, new Link(linkID.value, link, userID));
+                printAllLinks();
+                assert links.values().size() != 0;
             } else {
                 System.out.println(String.format("User %d does not exist", userID));
                 linkID.value = -1;
@@ -73,7 +74,24 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public String[] getLinks(int userID) {
-        return new String[0];
+        printAllLinks();
+        List<String> res = new ArrayList<>(0);
+        synchronized (links) {
+            links.values().stream()
+                    .filter(link -> !link.isPrivate || link.userID == userID)
+                    .forEach(link -> res.add(link.getLink()));
+        }
+        String[] result = new String[res.size()];
+        for (int i = 0; i < res.size(); i++) {
+            result[i] = res.get(i);
+        }
+
+        return result;
+    }
+
+    private void printAllLinks() {
+        links.values().forEach(System.out::print);
+        System.out.println();
     }
 
     public void setOrb(ORB orb) {
@@ -82,14 +100,26 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     private class Link {
         private String link = "";
-        public boolean isPrivate = false;
+        private int userID = -1;
+        public boolean isPrivate = true;
         public int id = -1;
 
-        public Link(int id, String link) {
+        public Link(int id, String link, int userID) {
+            this.link = link;
             this.id = id;
+            this.userID = userID;
         }
 
         public String getLink() {
+            return link;
+        }
+
+        public int getUserID() {
+            return userID;
+        }
+
+        @Override
+        public String toString() {
             return link;
         }
     }

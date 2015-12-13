@@ -169,6 +169,39 @@ public class Client {
         System.out.println(String.format("**** END %s ****", methodName));
     }
 
+    public static void testGetEmptyIfNoLinks() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId = new IntHolder();
+        exchangeSystem.register("linoor", userId);
+        assert userId.value == 0;
+
+        assert exchangeSystem.getLinks(userId.value).length == 0;
+
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
+    public static void testShouldSeeOnlyUsersLinks() {
+        String methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        System.out.println(String.format("**** %s ****", methodName));
+        IntHolder userId1 = new IntHolder();
+        exchangeSystem.register("linoor1", userId1);
+        exchangeSystem.addLink(userId1.value, "link1", new IntHolder());
+        exchangeSystem.addLink(userId1.value, "link2", new IntHolder());
+        exchangeSystem.addLink(userId1.value, "link3", new IntHolder());
+
+        IntHolder userId2 = new IntHolder();
+        exchangeSystem.register("linoor2", userId2);
+        exchangeSystem.addLink(userId2.value, "link4", new IntHolder());
+        exchangeSystem.addLink(userId2.value, "link5", new IntHolder());
+
+        String[] links = exchangeSystem.getLinks(userId1.value);
+        System.out.println("links: " + Arrays.toString(links));
+        assert Arrays.equals(links, new String[] {"link1", "link2", "link3"});
+
+        System.out.println(String.format("**** END %s ****", methodName));
+    }
+
     public static void main(String[] args) {
         try {
             // create and initialize the ORB
@@ -184,10 +217,12 @@ public class Client {
 //            testUserWithExistingNameReturnsMinusOne();
 //            testMultipleUsersRegisterAtTheSameTime();
 //            testRegisterMultipleUsersWithSameName();
-            testAddLink();
+//            testAddLink();
 //            testAddLinkWithWrongUser();
-            testRemoveLinkIfExisted();
-            testRemoveNotExistingLink();
+//            testRemoveLinkIfExisted();
+//            testRemoveNotExistingLink();
+            testGetEmptyIfNoLinks();
+            testShouldSeeOnlyUsersLinks();
         } catch (Exception e) {
             System.out.println("ERROR: " + e);
             e.printStackTrace();
