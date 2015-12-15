@@ -3,17 +3,15 @@
 cp src_compiled/* oramus_tests/
 cd oramus_tests/
 javac PMO_StartTest.java
+javac Start.java
 
-# duplicate &1(stdout) to 5
-for i in {1..1}
-do	
-	exec 5>&1
-	output=$(time java PMO_StartTest | tee /dev/fd/5)
+# starting Start
+echo "Starting server"
+java -ea Start -ORBInitialPort 1050 -ORBInitialHost localhost&
+sleep 1
 
-	echo -e "\n\n"
-	echo -e "Errors:\n"
-	echo "$output" | grep Blad
-done
+# running the tests
+time java PMO_StartTest -ORBInitialPort 1050 -ORBInitialHost localhost
 
 source ~/.bashrc
 jobsdone;
