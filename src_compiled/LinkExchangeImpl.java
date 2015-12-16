@@ -43,33 +43,75 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
         synchronized (links) {
             linkID.value = linkCounter.getAndIncrement();
-            links.put(linkID.value, new Link(link, linkID.value));
+            links.put(linkID.value, new Link(link, linkID.value, userID));
         }
     }
 
     @Override
     public boolean linkRemove(int userID, int linkID) {
-        return false;
+        synchronized (usernames) {
+            if (!usernames.containsValue(userID)) {
+                return false;
+            }
+        }
+
+        synchronized (links) {
+            if (!links.containsKey(linkID)) {
+                return false;
+            } else {
+                links.remove(linkID);
+                return true;
+            }
+        }
     }
 
     @Override
     public boolean publishLink(int userID, int linkID) {
-        return false;
+        synchronized (usernames) {
+            if (!usernames.containsValue(userID)) {
+                return false;
+            }
+        }
+
+        synchronized (links) {
+            if (!links.containsKey(linkID)) {
+                return false;
+            } else {
+                links.get(linkID).isPublished = true;
+                return true;
+            }
+        }
     }
 
     @Override
     public String[] getLinks(int userID) {
-        return new String[0];
+        List<String> results = new ArrayList<>();
+        synchronized (links) {
+           for (Link link : links.values()) {
+               if (link.isPublished || link.userid == userID) {
+                   results.add(link.link);
+               }
+           }
+        }
+
+        if (results.size() == 0) {
+            return new String[0];
+        } else {
+            String[] tmp = new String[results.size()];
+            return results.toArray(tmp);
+        }
     }
 
     private class Link {
         public String link;
         public int id;
+        public int userid;
         public boolean isPublished = false;
 
-        public Link(String link, int id) {
+        public Link(String link, int id, int userid) {
             this.link = link;
             this.id = id;
+            this.userid = userid;
         }
     }
 }
