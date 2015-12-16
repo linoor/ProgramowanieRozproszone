@@ -3,6 +3,7 @@ import org.omg.CORBA.ORB;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Created by linoor on 12/12/15.
@@ -87,11 +88,9 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     public String[] getLinks(int userID) {
         List<String> results = new ArrayList<>();
         synchronized (links) {
-           for (Link link : links.values()) {
-               if (link.isPublished || link.userid == userID) {
-                   results.add(link.link);
-               }
-           }
+            results.addAll(links.values().stream()
+                    .filter(link -> link.isPublished || link.userid == userID)
+                    .map(link -> link.link).collect(Collectors.toList()));
         }
 
         if (results.size() == 0) {
