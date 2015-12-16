@@ -23,23 +23,21 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public void register(String username, IntHolder userID) {
+        if (userDoesNotExist(userID.value)) {
+            userID.value = -1;
+        }
+
         synchronized (usernames) {
-            if (usernames.containsKey(username)) {
-                userID.value = -1;
-            } else {
-                userID.value = idCounter.getAndIncrement();
-                usernames.put(username, userID.value);
-            }
+            userID.value = idCounter.getAndIncrement();
+            usernames.put(username, userID.value);
         }
     }
 
     @Override
     public void addLink(int userID, String link, IntHolder linkID) {
-        synchronized (usernames) {
-            if (!usernames.containsValue(userID)) {
-                linkID.value = -1;
-                return;
-            }
+        if (userDoesNotExist(userID)) {
+            linkID.value = -1;
+            return;
         }
 
         synchronized (links) {
@@ -50,11 +48,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public boolean linkRemove(int userID, int linkID) {
-        synchronized (usernames) {
-            if (!usernames.containsValue(userID)) {
-                return false;
-            }
-        }
+        if (userDoesNotExist(userID)) return false;
 
         synchronized (links) {
             if (!links.containsKey(linkID)) {
@@ -66,13 +60,18 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
         }
     }
 
-    @Override
-    public boolean publishLink(int userID, int linkID) {
+    private boolean userDoesNotExist(int userID) {
         synchronized (usernames) {
             if (!usernames.containsValue(userID)) {
-                return false;
+                return true;
             }
         }
+        return false;
+    }
+
+    @Override
+    public boolean publishLink(int userID, int linkID) {
+        if (userDoesNotExist(userID)) return false;
 
         synchronized (links) {
             if (!links.containsKey(linkID)) {
