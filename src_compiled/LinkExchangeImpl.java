@@ -11,7 +11,7 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     private ORB orb;
 
     private AtomicInteger idCounter = new AtomicInteger(0);
-    private Map<String, Integer> usernames = new HashMap<>();
+    private final Map<String, Integer> usernames = new HashMap<>();
 
     public void setOrb(ORB orb) {
         this.orb = orb;
