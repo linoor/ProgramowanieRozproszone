@@ -13,6 +13,9 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     private AtomicInteger idCounter = new AtomicInteger(0);
     private final Map<String, Integer> usernames = new HashMap<>();
 
+    private AtomicInteger linkCounter = new AtomicInteger(0);
+    private final Map<Integer, Link> links = new HashMap<>();
+
     public void setOrb(ORB orb) {
         this.orb = orb;
     }
@@ -31,7 +34,17 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
 
     @Override
     public void addLink(int userID, String link, IntHolder linkID) {
+        synchronized (usernames) {
+            if (!usernames.containsValue(userID)) {
+                linkID.value = -1;
+                return;
+            }
+        }
 
+        synchronized (links) {
+            linkID.value = linkCounter.getAndIncrement();
+            links.put(linkID.value, new Link(link, linkID.value));
+        }
     }
 
     @Override
@@ -47,5 +60,16 @@ public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     @Override
     public String[] getLinks(int userID) {
         return new String[0];
+    }
+
+    private class Link {
+        public String link;
+        public int id;
+        public boolean isPublished = false;
+
+        public Link(String link, int id) {
+            this.link = link;
+            this.id = id;
+        }
     }
 }
