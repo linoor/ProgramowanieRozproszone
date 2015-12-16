@@ -10,13 +10,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LinkExchangeImpl extends LinkExchangeSystemPOA {
     private ORB orb;
 
+    private AtomicInteger idCounter = new AtomicInteger(0);
+    private Map<String, Integer> usernames = new HashMap<>();
+
     public void setOrb(ORB orb) {
         this.orb = orb;
     }
 
     @Override
     public void register(String username, IntHolder userID) {
-        
+        synchronized (usernames) {
+            if (usernames.containsKey(username)) {
+                userID.value = -1;
+            } else {
+                userID.value = idCounter.getAndIncrement();
+                usernames.put(username, userID.value);
+            }
+        }
     }
 
     @Override
