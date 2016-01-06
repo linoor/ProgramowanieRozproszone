@@ -23,9 +23,11 @@ public:
 	double *y;
 	double *z;
 	int numberOfParticles;
+	double avgMinDist = numeric_limits<double>::max();
 
 	int* getTwoClosestsParticles();
 	void fuseTwoParticles(int i, int j);
+	double getMinDistance(int i);
 };
 
 #endif /* SIMULATION_H_ */
