@@ -67,12 +67,11 @@ int main(int ac, char **av) {
 	MPI_Init(&ac, &av);
 
 	int rank;
-
  	MPI_Comm_rank ( MPI_COMM_WORLD, &rank );
 
 	Simulation *sim = new Simulation();
 
-	if ( ! rank ) {
+	if (!rank) {
   	  double *x = new double[ ALL_PARTICLES ];
 	  double *y = new double[ ALL_PARTICLES ];
 	  double *z = new double[ ALL_PARTICLES ];
@@ -102,7 +101,7 @@ int main(int ac, char **av) {
 	gettimeofday( &tf, NULL );
 	double tk = tf.tv_sec + tf.tv_usec * 0.000001;
 
-        cout << "Pomiar czasu " << ( tk - t0 ) << " sekund" <<  endl;
+    cout << "Pomiar czasu " << ( tk - t0 ) << " sekund" <<  endl;
 
 	MPI_Finalize();
 	return 0;
