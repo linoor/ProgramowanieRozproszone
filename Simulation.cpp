@@ -22,28 +22,32 @@ double Simulation::getAvgMinDistance(void) {
 // TODO parallel
 void Simulation::remove(int numberOfPairsToRemove) {
     while (numberOfPairsToRemove > 0) {
-        
+        int* twoClosest = Simulation::getTwoClosestsParticles();
+        fuseTwoParticles(twoClosest[0], twoClosest[1]);
+
+        numberOfPairsToRemove--;
     }
+    Simulation::calcAvgMinDistance();
 }
 void Simulation::calcAvgMinDistance(void) {
-    sumOfAvg = 0;
+    double sumOfAvg = 0.0;
     for (int i = 0; i < numberOfParticles; i++) {
-       sumOfAvg += getAvgMinDistance(i);
+       sumOfAvg += getMinDistance(i);
     }
     this->avgMinDist = sumOfAvg / numberOfParticles;
 }
 
 // TODO parallel
-double Simulation::getMinDistance(int index) {
+double Simulation::getMinDistance(int i) {
     double minDistance = numeric_limits<double>::max();
     int indexSoFar = -1;
-    for (int i = 0; i < numberOfParticles; i++) {
-        if (index == i) continue;
+    for (int j = 0; j < numberOfParticles; j++) {
+        if (i == j) continue;
 
         double dist = Helper::getDistance(x, y, z, i, j);
         if (dist < minDistance) {
             minDistance = dist;
-            indexSoFar = i;
+            indexSoFar = j;
         }
     }
 

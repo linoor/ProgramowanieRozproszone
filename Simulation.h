@@ -2,6 +2,9 @@
  * Simulation.h
  *
  */
+#include <limits>
+
+using namespace std;
 
 #ifndef SIMULATION_H_
 #define SIMULATION_H_
