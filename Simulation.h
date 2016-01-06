@@ -18,6 +18,14 @@ public:
 // te metody wywolywane sa dla _wszystkich_ procesow
 	void remove( int numberOfPairsToRemove );
 	void calcAvgMinDistance( void );
+
+	double *x;
+	double *y;
+	double *z;
+	int numberOfParticles;
+
+	int* getTwoClosestsParticles();
+	void fuseTwoParticles(int i, int j);
 };
 
 #endif /* SIMULATION_H_ */

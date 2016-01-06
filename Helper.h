@@ -10,7 +10,6 @@ class Helper {
       static double getDistance( double *x, double *y, double *z, int i, int j );
       
       static double middle( double *x, int i, int j );
-
 };
 
 #endif

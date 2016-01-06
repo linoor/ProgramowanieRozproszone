@@ -82,6 +82,12 @@ int main(int ac, char **av) {
    	  
 	  // udostepniam czastki procesowi z rank==0
 	  sim->setParticles( x, y, z, ALL_PARTICLES );
+
+
+      // stuff i added
+      int* closestsTwo = sim->getTwoClosestsParticles();
+      cout << x[closestsTwo[0]] << " " << y[closestsTwo[0]] << " " << z[closestsTwo[0]] << endl;
+      cout << y[closestsTwo[1]] << " " << y[closestsTwo[1]] << " " << z[closestsTwo[1]] << endl;
 	}
 
 	// tu sa obliczenia - start pomiaru czasu
