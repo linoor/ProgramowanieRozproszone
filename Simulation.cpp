@@ -17,7 +17,7 @@ void Simulation::setParticles(double *x, double *y, double *z, int numberOfParti
     this->numberOfParticles = numberOfParticles;
 }
 double Simulation::getAvgMinDistance(void) {
-    this->avgMinDist;
+    return this->avgMinDist;
 }
 
 void Simulation::remove(int numberOfPairsToRemove) {
@@ -65,7 +65,6 @@ void Simulation::calcAvgMinDistance(void) {
     }
 }
 
-// TODO parallel
 double Simulation::getMinDistance(int i) {
     double minDistance = numeric_limits<double>::max();
     int indexSoFar = -1;
