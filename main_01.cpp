@@ -91,7 +91,7 @@ int main(int ac, char **av) {
 	
 	for (int i = 0; i < REPETITIONS; i++) {
 		sim->remove( NUMBER_OF_PARTICLES_TO_REMOVE_ONCE );
-//		sim->calcAvgMinDistance();
+		sim->calcAvgMinDistance();
 
 		if (!rank) {
 		   cout << "Krok " << ( i + 1 ) << " -> " <<

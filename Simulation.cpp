@@ -52,13 +52,10 @@ void Simulation::calcAvgMinDistance(void) {
     }
 
     // sending back the results to the main process
-    cout << "the rank: " << rank << endl;
     if (rank != master) {
-        cout << "test" << endl;
         MPI_Send(&sum, 1, MPI_DOUBLE, master, 1, MPI_COMM_WORLD);
     } else {
         // summing all of the received data
-        cout << "test2" << endl;
         double sum_all = sum;
         for (int i = 1; i < numprocs; i++) {
             MPI_Recv(&sum, 1, MPI_DOUBLE, MPI_ANY_SOURCE, 1, MPI_COMM_WORLD, &status);
@@ -120,7 +117,5 @@ void Simulation::fuseTwoParticles(int i, int j) {
     y[j] = y[numberOfParticles-1];
     z[j] = z[numberOfParticles-1];
     // decrement the number of the particles
-    // TODO parallel
     numberOfParticles--;
-    cout << "fused particles" << endl;
 }
