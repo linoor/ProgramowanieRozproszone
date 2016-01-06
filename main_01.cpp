@@ -82,24 +82,6 @@ int main(int ac, char **av) {
    	  
 	  // udostepniam czastki procesowi z rank==0
 	  sim->setParticles( x, y, z, ALL_PARTICLES );
-
-
-      // stuff i added
-//      int* closestsTwo = sim->getTwoClosestsParticles();
-//      cout << x[closestsTwo[0]] << " " << y[closestsTwo[0]] << " " << z[closestsTwo[0]] << endl;
-//      cout << y[closestsTwo[1]] << " " << y[closestsTwo[1]] << " " << z[closestsTwo[1]] << endl;
-
-//        int numberOfParticlesBefore = sim->numberOfParticles;
-//        int numberOfParticles = sim->numberOfParticles;
-//        cout << "particle 1: " << x[0] << " " << y[0] << " " << z[0] << endl;
-//        cout << "particle 2: " << x[1] << " " << y[1] << " " << z[1] << endl;
-//        cout << "last particle: " << x[numberOfParticles-1] << " " << y[numberOfParticles-1] << " " << z[numberOfParticles-1] << endl;
-//        sim->fuseTwoParticles(0, 1);
-//        numberOfParticles = sim->numberOfParticles;
-//        cout << "number of particles before: " << numberOfParticlesBefore << endl;
-//        cout << "number of particles now: " << numberOfParticles << endl;
-//        cout << "particle 1: " << x[0] << " " << y[0] << " " << z[0] << endl;
-//        cout << "last particle: " << x[numberOfParticles-1] << " " << y[numberOfParticles-1] << " " << z[numberOfParticles-1] << endl;
 	}
 
 	// tu sa obliczenia - start pomiaru czasu
@@ -109,7 +91,7 @@ int main(int ac, char **av) {
 	
 	for (int i = 0; i < REPETITIONS; i++) {
 		sim->remove( NUMBER_OF_PARTICLES_TO_REMOVE_ONCE );
-		sim->calcAvgMinDistance();
+//		sim->calcAvgMinDistance();
 
 		if (!rank) {
 		   cout << "Krok " << ( i + 1 ) << " -> " <<
