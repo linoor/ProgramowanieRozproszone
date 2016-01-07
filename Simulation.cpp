@@ -25,9 +25,9 @@ void Simulation::remove(int numberOfPairsToRemove) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if (rank == 0) {
         while (numberOfPairsToRemove > 0) {
-            int *twoClosest = Simulation::getTwoClosestsParticles();
+            Simulation::getTwoClosestsParticles();
             cout << "got two closest particles" << endl;
-            fuseTwoParticles(twoClosest[0], twoClosest[1]);
+            fuseTwoParticles(closest[0], closest[1]);
             cout << "fused particles" << endl;
             numberOfPairsToRemove--;
         }
@@ -85,11 +85,11 @@ double Simulation::getMinDistance(int i) {
 
 // TODO make it parallel (divide the work)
 // TODO refactor using getIndexOfClosest
-int* Simulation::getTwoClosestsParticles() {
+void Simulation::getTwoClosestsParticles() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    int* results = new int[2];
+    int results[2];
     double closestDistanceSoFar = numeric_limits<double>::max();
 
     for (int i = 0; i < numberOfParticles; i++) {
@@ -104,7 +104,8 @@ int* Simulation::getTwoClosestsParticles() {
             }
         }
     }
-    return results;
+    this->closest[0] = results[0];
+    this->closest[1] = results[1];
 }
 
 void Simulation::fuseTwoParticles(int i, int j) {

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int LEN = 50;
+const int LEN = 20;
 const int SIZE = LEN * LEN * LEN;
 const int REPETITIONS = 5;
 const int NUMBER_OF_PARTICLES_TO_REMOVE_ONCE = 2;
