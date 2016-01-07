@@ -26,7 +26,9 @@ void Simulation::remove(int numberOfPairsToRemove) {
     if (rank == 0) {
         while (numberOfPairsToRemove > 0) {
             int *twoClosest = Simulation::getTwoClosestsParticles();
+            cout << "got two closest particles" << endl;
             fuseTwoParticles(twoClosest[0], twoClosest[1]);
+            cout << "fused particles" << endl;
             numberOfPairsToRemove--;
         }
     }
@@ -88,13 +90,12 @@ int* Simulation::getTwoClosestsParticles() {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     int* results = new int[2];
-
     double closestDistanceSoFar = numeric_limits<double>::max();
+
     for (int i = 0; i < numberOfParticles; i++) {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
-            // TODO use getDistanceSQ?
             double dist = Helper::getDistance(x, y, z, i, j);
             if (dist < closestDistanceSoFar) {
                 closestDistanceSoFar = dist;
