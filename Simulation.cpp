@@ -40,28 +40,27 @@ void Simulation::remove(int numberOfPairsToRemove) {
     }
 }
 void Simulation::calcAvgMinDistance(void) {
+    // Get the rank of the process
+    int rank;
+    int master = 0;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
     double sumOfAvg = 0.0;
     for (int i = 0; i < numberOfParticles; i++) {
-       sumOfAvg += getMinDistance(i);
+        double minDistance = numeric_limits<double>::max();
+        int indexSoFar = -1;
+        for (int j = 0; j < numberOfParticles; j++) {
+            if (i == j) continue;
+
+            double dist = Helper::getDistanceSQ(x, y, z, i, j);
+            if (dist < minDistance) {
+                minDistance = dist;
+                indexSoFar = j;
+            }
+        }
+        sumOfAvg += minDistance;
     }
     this->avgMinDist = sumOfAvg / numberOfParticles;
-}
-
-// TODO parallel
-double Simulation::getMinDistance(int i) {
-    double minDistance = numeric_limits<double>::max();
-    int indexSoFar = -1;
-    for (int j = 0; j < numberOfParticles; j++) {
-        if (i == j) continue;
-
-        double dist = Helper::getDistanceSQ(x, y, z, i, j);
-        if (dist < minDistance) {
-            minDistance = dist;
-            indexSoFar = j;
-        }
-    }
-
-    return sqrt(minDistance);
 }
 
 // TODO make it parallel (divide the work)
