@@ -20,7 +20,7 @@ void Simulation::setParticles(double *x, double *y, double *z, int numberOfParti
 }
 
 double Simulation::getAvgMinDistance(void) {
-    this->avgMinDist;
+    return this->avgMinDist;
 }
 
 void Simulation::remove(int numberOfPairsToRemove) {
