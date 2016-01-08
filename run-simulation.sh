@@ -5,4 +5,4 @@ mpicxx -O0 Helper.cpp Simulation.cpp main_01.cpp -o simulation || exit 1; # exit
 mpirun -n $1 ./simulation
 
 source ~/.bashrc
-jd
+jobsdone
