@@ -33,7 +33,10 @@ void Simulation::remove(int numberOfPairsToRemove) {
         while (numberOfPairsToRemove > 0) {
             cout << "getting two closest particles" << endl;
             int* closestParticles = Simulation::getTwoClosestsParticles();
+            cout << "got two closest particles " << endl;
+            cout << "fusing particles" << endl;
             fuseTwoParticles(closestParticles[0], closestParticles[1]);
+            cout << "fused particles" << endl;
 
             numberOfPairsToRemove--;
         }
@@ -84,7 +87,6 @@ int* Simulation::getTwoClosestsParticles() {
 }
 
 void Simulation::fuseTwoParticles(int i, int j) {
-    cout << "fusing particles" << endl;
     // insert the new particle in the place of the first particle
     x[i] = Helper::middle(x, i, j);
     y[i] = Helper::middle(y, i, j);
@@ -95,5 +97,4 @@ void Simulation::fuseTwoParticles(int i, int j) {
     z[j] = z[numberOfParticles-1];
     // decrement the number of the particles
     numberOfParticles--;
-    cout << "fused particles" << endl;
 }

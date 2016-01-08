@@ -47,15 +47,15 @@ void generate( double *x, double *y, double *z ) {
 	  for ( int k = 0; k < SHUFFLE_TIMES; k++ ) {
 	     i = random() % ALL_PARTICLES;
 	     j = random() % ALL_PARTICLES;
-	  
+
 	     xtmp = x[ i ];
 	     ytmp = y[ i ];
 	     ztmp = z[ i ];
-	     
+
 	     x[ i ] = x[ j ];
 	     y[ i ] = y[ j ];
 	     z[ i ] = z[ j ];
-	     
+
 	     x[ j ] = xtmp;
 	     y[ j ] = ytmp;
 	     z[ j ] = ztmp;
@@ -91,7 +91,9 @@ int main(int ac, char **av) {
 	
 	for (int i = 0; i < REPETITIONS; i++) {
 		sim->remove( NUMBER_OF_PARTICLES_TO_REMOVE_ONCE );
+		cout << "calculating avg" << endl;
 		sim->calcAvgMinDistance();
+		cout << "finished calculating avg" << endl;
 
 		if (!rank) {
 		   cout << "Krok " << ( i + 1 ) << " -> " <<
