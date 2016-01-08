@@ -6,7 +6,9 @@
 
 using namespace std;
 
-Simulation::Simulation() {}
+Simulation::Simulation() {
+    avgMinDist = numeric_limits<double>::max();
+}
 Simulation::~Simulation() {}
 
 void Simulation::setParticles(double *x, double *y, double *z, int numberOfParticles) {
@@ -29,13 +31,16 @@ void Simulation::remove(int numberOfPairsToRemove) {
 
     if (rank == master) {
         while (numberOfPairsToRemove > 0) {
+            cout << "getting two closest particles" << endl;
             int* twoClosest = Simulation::getTwoClosestsParticles();
             fuseTwoParticles(twoClosest[0], twoClosest[1]);
 
             numberOfPairsToRemove--;
         }
     }
+    cout << "calculating avg min dist" << endl;
     Simulation::calcAvgMinDistance();
+    cout << "calculated avg min dist" << endl;
 }
 void Simulation::calcAvgMinDistance(void) {
     double sumOfAvg = 0.0;
@@ -67,14 +72,13 @@ double Simulation::getMinDistance(int i) {
 int* Simulation::getTwoClosestsParticles() {
     int* results = new int[2];
     double closestDistanceSoFar = numeric_limits<double>::max();
-    cout << numberOfParticles << endl;
     for (int i = 0; i < numberOfParticles; i++) {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
             double dist = Helper::getDistance(x, y, z, i, j);
             if (dist < closestDistanceSoFar) {
-                cout << "new closes distance = " << dist << endl;
+                cout << "new closest distance = " << dist << endl;
                 closestDistanceSoFar = dist;
                 results[0] = i;
                 results[1] = j;
@@ -95,6 +99,5 @@ void Simulation::fuseTwoParticles(int i, int j) {
     y[j] = y[numberOfParticles-1];
     z[j] = z[numberOfParticles-1];
     // decrement the number of the particles
-    // TODO parallel
     numberOfParticles--;
 }
