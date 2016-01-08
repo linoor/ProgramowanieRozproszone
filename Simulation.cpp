@@ -47,8 +47,10 @@ void Simulation::calcAvgMinDistance(void) {
     int rank;
     const int master = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    int num_of_processes;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
 
-    // send the data to other processes
+    // send the data about the number of particles
     MPI_Bcast(&numberOfParticles, 1, MPI_INT, master, MPI_COMM_WORLD);
     // initialize the arrays
     if (rank != 0) {
@@ -56,10 +58,10 @@ void Simulation::calcAvgMinDistance(void) {
         y = new double[numberOfParticles];
         z = new double[numberOfParticles];
     }
+    // send the data about the three vectors of particles
     MPI_Bcast(x, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
     MPI_Bcast(y, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
     MPI_Bcast(z, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
-
 
 //    double sumOfAvg = 0.0;
 //    for (int i = 0; i < numberOfParticles; i++) {
