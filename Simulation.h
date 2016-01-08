@@ -27,6 +27,7 @@ public:
 	double *z;
 	int numberOfParticles;
 	double avgMinDist;
+	bool variables_set;
 
 	int* getTwoClosestsParticles();
 	void fuseTwoParticles(int i, int j);
