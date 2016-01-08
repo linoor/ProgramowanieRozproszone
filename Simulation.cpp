@@ -31,12 +31,8 @@ void Simulation::remove(int numberOfPairsToRemove) {
 
     if (rank == master) {
         while (numberOfPairsToRemove > 0) {
-            cout << "getting two closest particles" << endl;
             int* closestParticles = Simulation::getTwoClosestsParticles();
-            cout << "got two closest particles " << endl;
-            cout << "fusing particles" << endl;
             fuseTwoParticles(closestParticles[0], closestParticles[1]);
-            cout << "fused particles" << endl;
 
             numberOfPairsToRemove--;
         }
@@ -88,7 +84,6 @@ void Simulation::calcAvgMinDistance(void) {
     if (rank == master) {
        sums = new double[num_of_processes];
     }
-    cout << "receiving data from other processes" << endl;
     // receiving data from other processes into the sums buffer
     MPI_Gather(&sum, 1, MPI_DOUBLE,
                sums, 1, MPI_DOUBLE,
@@ -98,7 +93,6 @@ void Simulation::calcAvgMinDistance(void) {
     if (rank == master) {
         double allsums = 0;
         for (int i = 0; i < num_of_processes; i++) {
-            cout << "adding sum" << sums[i] << endl;
             allsums += sums[i];
         }
         this->avgMinDist = allsums / numberOfParticles;

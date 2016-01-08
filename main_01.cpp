@@ -90,10 +90,8 @@ int main(int ac, char **av) {
 	double t0 = tf.tv_sec + tf.tv_usec * 0.000001;
 	
 	for (int i = 0; i < REPETITIONS; i++) {
-		sim->remove( NUMBER_OF_PARTICLES_TO_REMOVE_ONCE );
-		cout << "calculating avg" << endl;
+        sim->remove( NUMBER_OF_PARTICLES_TO_REMOVE_ONCE );
 		sim->calcAvgMinDistance();
-		cout << "finished calculating avg" << endl;
 
 		if (!rank) {
 		   cout << "Krok " << ( i + 1 ) << " -> " <<
