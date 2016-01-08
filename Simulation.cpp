@@ -32,8 +32,8 @@ void Simulation::remove(int numberOfPairsToRemove) {
     if (rank == master) {
         while (numberOfPairsToRemove > 0) {
             cout << "getting two closest particles" << endl;
-            int* twoClosest = Simulation::getTwoClosestsParticles();
-            fuseTwoParticles(twoClosest[0], twoClosest[1]);
+            int* closestParticles = Simulation::getTwoClosestsParticles();
+            fuseTwoParticles(closestParticles[0], closestParticles[1]);
 
             numberOfPairsToRemove--;
         }
