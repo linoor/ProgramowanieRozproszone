@@ -38,9 +38,6 @@ void Simulation::remove(int numberOfPairsToRemove) {
             numberOfPairsToRemove--;
         }
     }
-    cout << "calculating avg min dist" << endl;
-    Simulation::calcAvgMinDistance();
-    cout << "calculated avg min dist" << endl;
 }
 void Simulation::calcAvgMinDistance(void) {
     double sumOfAvg = 0.0;
@@ -57,14 +54,14 @@ double Simulation::getMinDistance(int i) {
     for (int j = 0; j < numberOfParticles; j++) {
         if (i == j) continue;
 
-        double dist = Helper::getDistance(x, y, z, i, j);
+        double dist = Helper::getDistanceSQ(x, y, z, i, j);
         if (dist < minDistance) {
             minDistance = dist;
             indexSoFar = j;
         }
     }
 
-    return minDistance;
+    return sqrt(minDistance);
 }
 
 // TODO make it parallel (divide the work)
