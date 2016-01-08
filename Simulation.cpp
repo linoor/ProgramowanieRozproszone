@@ -63,22 +63,46 @@ void Simulation::calcAvgMinDistance(void) {
     MPI_Bcast(y, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
     MPI_Bcast(z, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
 
-//    double sumOfAvg = 0.0;
-//    for (int i = 0; i < numberOfParticles; i++) {
-//        double minDistance = numeric_limits<double>::max();
-//        int indexSoFar = -1;
-//        for (int j = 0; j < numberOfParticles; j++) {
-//            if (i == j) continue;
-//
-//            double dist = Helper::getDistance(x, y, z, i, j);
-//            if (dist < minDistance) {
-//                minDistance = dist;
-//                indexSoFar = j;
-//            }
-//        }
-//        sumOfAvg += minDistance;
-//    }
-//    this->avgMinDist = sumOfAvg / numberOfParticles;
+    int chunksize = numberOfParticles / num_of_processes;
+    int avg = 0;
+
+    int lower = rank * chunksize;
+    int upper = lower + chunksize;
+
+    double sum = 0.0;
+    for (int i = lower; i < upper; i++) {
+        double minDistance = numeric_limits<double>::max();
+        for (int j = 0; j < numberOfParticles; j++) {
+            if (i == j) continue;
+
+            double dist = Helper::getDistance(x, y, z, i, j);
+            if (dist < minDistance) {
+                minDistance = dist;
+            }
+        }
+        sum += minDistance;
+    }
+
+    // create a buffer for the results
+    double *sums;
+    if (rank == master) {
+       sums = new double[num_of_processes];
+    }
+    cout << "receiving data from other processes" << endl;
+    // receiving data from other processes into the sums buffer
+    MPI_Gather(&sum, 1, MPI_DOUBLE,
+               sums, 1, MPI_DOUBLE,
+               0, MPI_COMM_WORLD);
+
+    // take the average from all of the results
+    if (rank == master) {
+        double allsums = 0;
+        for (int i = 0; i < num_of_processes; i++) {
+            cout << "adding sum" << sums[i] << endl;
+            allsums += sums[i];
+        }
+        this->avgMinDist = allsums / numberOfParticles;
+    }
 }
 
 int* Simulation::getTwoClosestsParticles() {
