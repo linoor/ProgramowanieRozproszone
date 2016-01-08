@@ -45,30 +45,47 @@ void Simulation::remove(int numberOfPairsToRemove) {
 void Simulation::calcAvgMinDistance(void) {
     // Get the rank of the process
     int rank;
-    int master = 0;
+    const int master = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    double sumOfAvg = 0.0;
-    for (int i = 0; i < numberOfParticles; i++) {
-        double minDistance = numeric_limits<double>::max();
-        int indexSoFar = -1;
-        for (int j = 0; j < numberOfParticles; j++) {
-            if (i == j) continue;
-
-            double dist = Helper::getDistance(x, y, z, i, j);
-            if (dist < minDistance) {
-                minDistance = dist;
-                indexSoFar = j;
-            }
-        }
-        sumOfAvg += minDistance;
+    // send the data to other processes
+    MPI_Bcast(&numberOfParticles, 1, MPI_INT, master, MPI_COMM_WORLD);
+    // initialize the arrays
+    if (rank != 0) {
+        x = new double[numberOfParticles];
+        y = new double[numberOfParticles];
+        z = new double[numberOfParticles];
     }
-    this->avgMinDist = sumOfAvg / numberOfParticles;
+    MPI_Bcast(x, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
+    MPI_Bcast(y, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
+    MPI_Bcast(z, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
+
+
+//    double sumOfAvg = 0.0;
+//    for (int i = 0; i < numberOfParticles; i++) {
+//        double minDistance = numeric_limits<double>::max();
+//        int indexSoFar = -1;
+//        for (int j = 0; j < numberOfParticles; j++) {
+//            if (i == j) continue;
+//
+//            double dist = Helper::getDistance(x, y, z, i, j);
+//            if (dist < minDistance) {
+//                minDistance = dist;
+//                indexSoFar = j;
+//            }
+//        }
+//        sumOfAvg += minDistance;
+//    }
+//    this->avgMinDist = sumOfAvg / numberOfParticles;
 }
 
-// TODO make it parallel (divide the work)
-// TODO refactor using getIndexOfClosest
 int* Simulation::getTwoClosestsParticles() {
+    // Get the rank of the process
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    int size ; // liczba procesow
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
     int* results = new int[2];
     double closestDistanceSoFar = numeric_limits<double>::max();
     for (int i = 0; i < numberOfParticles; i++) {
