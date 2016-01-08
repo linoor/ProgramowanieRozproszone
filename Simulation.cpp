@@ -76,7 +76,7 @@ int* Simulation::getTwoClosestsParticles() {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
-            double dist = Helper::getDistance(x, y, z, i, j);
+            double dist = Helper::getDistanceSQ(x, y, z, i, j);
             if (dist < closestDistanceSoFar) {
                 cout << "new closest distance = " << dist << endl;
                 closestDistanceSoFar = dist;
