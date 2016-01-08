@@ -2,6 +2,7 @@
 #include "Helper.h"
 #include <iostream>
 #include <limits>
+#include <mpi.h>
 
 using namespace std;
 
@@ -15,17 +16,24 @@ void Simulation::setParticles(double *x, double *y, double *z, int numberOfParti
     this->z = z;
     this->numberOfParticles = numberOfParticles;
 }
-// TODO parallel
+
 double Simulation::getAvgMinDistance(void) {
     this->avgMinDist;
 }
-// TODO parallel
-void Simulation::remove(int numberOfPairsToRemove) {
-    while (numberOfPairsToRemove > 0) {
-        int* twoClosest = Simulation::getTwoClosestsParticles();
-        fuseTwoParticles(twoClosest[0], twoClosest[1]);
 
-        numberOfPairsToRemove--;
+void Simulation::remove(int numberOfPairsToRemove) {
+    // Get the rank of the process
+    int rank;
+    int master = 0;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    if (rank == master) {
+        while (numberOfPairsToRemove > 0) {
+            int* twoClosest = Simulation::getTwoClosestsParticles();
+            fuseTwoParticles(twoClosest[0], twoClosest[1]);
+
+            numberOfPairsToRemove--;
+        }
     }
     Simulation::calcAvgMinDistance();
 }
@@ -64,7 +72,6 @@ int* Simulation::getTwoClosestsParticles() {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
-            // TODO use getDistanceSQ?
             double dist = Helper::getDistance(x, y, z, i, j);
             if (dist < closestDistanceSoFar) {
                 cout << "new closes distance = " << dist << endl;
