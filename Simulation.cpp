@@ -52,7 +52,7 @@ void Simulation::calcAvgMinDistance(void) {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
-            double dist = Helper::getDistanceSQ(x, y, z, i, j);
+            double dist = Helper::getDistance(x, y, z, i, j);
             if (dist < minDistance) {
                 minDistance = dist;
                 indexSoFar = j;
@@ -72,9 +72,8 @@ int* Simulation::getTwoClosestsParticles() {
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
-            double dist = Helper::getDistanceSQ(x, y, z, i, j);
+            double dist = Helper::getDistance(x, y, z, i, j);
             if (dist < closestDistanceSoFar) {
-                cout << "new closest distance = " << dist << endl;
                 closestDistanceSoFar = dist;
                 results[0] = i;
                 results[1] = j;
@@ -96,4 +95,5 @@ void Simulation::fuseTwoParticles(int i, int j) {
     z[j] = z[numberOfParticles-1];
     // decrement the number of the particles
     numberOfParticles--;
+    cout << "fused particles" << endl;
 }
