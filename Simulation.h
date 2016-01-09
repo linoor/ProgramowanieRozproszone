@@ -28,8 +28,9 @@ public:
 	int numberOfParticles;
 	double avgMinDist;
 	bool variables_set;
+	int closestPair[2];
 
-	int* getTwoClosestsParticles();
+	void getTwoClosestsParticles();
 	void fuseTwoParticles(int i, int j);
 	double getMinDistance(int i);
 };

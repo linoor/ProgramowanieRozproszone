@@ -47,12 +47,10 @@ void Simulation::remove(int numberOfPairsToRemove) {
     }
 
     while (numberOfPairsToRemove > 0) {
-        if (rank == master) {
-            int *closestParticles = Simulation::getTwoClosestsParticles();
-            fuseTwoParticles(closestParticles[0], closestParticles[1]);
-
-        }
+        Simulation::getTwoClosestsParticles();
+        fuseTwoParticles(closestPair[0], closestPair[1]);
         numberOfPairsToRemove--;
+
         // update the other vectors and number of particles
         MPI_Bcast(&numberOfParticles, 1, MPI_INT, master, MPI_COMM_WORLD);
         MPI_Bcast(x, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
@@ -118,20 +116,45 @@ void Simulation::calcAvgMinDistance(void) {
         for (int i = 0; i < num_of_processes; i++) {
             allsums += sums[i];
         }
+
+        // if the data has not been scattered evenly
+
         this->avgMinDist = allsums / numberOfParticles;
     }
 }
 
-int* Simulation::getTwoClosestsParticles() {
+void Simulation::getTwoClosestsParticles() {
     // Get the rank of the process
     int rank;
+    const int master = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    int size ; // liczba procesow
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    int num_of_processes;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
 
-    int* results = new int[2];
+    int *i_indexes;
+    // create a buffer with i indexes
+    if (rank == master) {
+        i_indexes = new int[numberOfParticles];
+        for (int i = 0; i < numberOfParticles; i++) {
+            i_indexes[i] = i;
+        }
+        // creating a buffer telling each processes how many data it gets
+    }
+
+    int elements_per_proc = numberOfParticles / num_of_processes;
+
+    // create a buffer that will hold a subset of i indexes
+    int *sub_i_indexes = new int[elements_per_proc];
+
+    // send the indexes to each of the process
+    MPI_Scatter(i_indexes, elements_per_proc, MPI_INT,
+                sub_i_indexes, elements_per_proc, MPI_INT,
+                0, MPI_COMM_WORLD);
+
+    int results[2];
     double closestDistanceSoFar = numeric_limits<double>::max();
-    for (int i = 0; i < numberOfParticles; i++) {
+    for (int k = 0; k < elements_per_proc; k++) {
+        int i = sub_i_indexes[k];
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
 
@@ -143,7 +166,34 @@ int* Simulation::getTwoClosestsParticles() {
             }
         }
     }
-    return results;
+
+    // create a buffer for the results
+    int *pairs;
+    if (rank == master) {
+        pairs = new int[num_of_processes*2];
+    }
+    // receiving data from other processes into the sums buffer
+    MPI_Gather(results, 2, MPI_INT,
+               pairs, 2, MPI_INT,
+               0, MPI_COMM_WORLD);
+
+    // process all of the pairs that you got
+    if (rank == master) {
+        int closest[2];
+        double closestDist = numeric_limits<double>::max();
+        for (int k = 0; k < num_of_processes*2; k += 2) {
+            int i = pairs[k];
+            int j = pairs[k+1];
+            double dist = Helper::getDistance(x, y, z, i, j);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closest[0] = i;
+                closest[1] = j;
+            }
+        }
+        this->closestPair[0] = closest[0];
+        this->closestPair[1] = closest[1];
+    }
 }
 
 void Simulation::fuseTwoParticles(int i, int j) {
