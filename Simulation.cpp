@@ -46,13 +46,18 @@ void Simulation::remove(int numberOfPairsToRemove) {
         variables_set = true;
     }
 
-    if (rank == master) {
-        while (numberOfPairsToRemove > 0) {
-            int* closestParticles = Simulation::getTwoClosestsParticles();
+    while (numberOfPairsToRemove > 0) {
+        if (rank == master) {
+            int *closestParticles = Simulation::getTwoClosestsParticles();
             fuseTwoParticles(closestParticles[0], closestParticles[1]);
 
-            numberOfPairsToRemove--;
         }
+        numberOfPairsToRemove--;
+        // update the other vectors and number of particles
+        MPI_Bcast(&numberOfParticles, 1, MPI_INT, master, MPI_COMM_WORLD);
+        MPI_Bcast(x, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
+        MPI_Bcast(y, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
+        MPI_Bcast(z, numberOfParticles, MPI_DOUBLE, master, MPI_COMM_WORLD);
     }
 }
 void Simulation::calcAvgMinDistance(void) {
@@ -63,14 +68,32 @@ void Simulation::calcAvgMinDistance(void) {
     int num_of_processes;
     MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
 
-    int chunksize = numberOfParticles / num_of_processes;
-    int avg = 0;
+    int *i_indexes;
+    // create a buffer with i indexes
+    if (rank == master) {
+        i_indexes = new int[numberOfParticles];
+        for (int i = 0; i < numberOfParticles; i++) {
+            i_indexes[i] = i;
+        }
+    }
 
-    int lower = rank * chunksize;
-    int upper = lower + chunksize;
+    int elements_per_proc = numberOfParticles / num_of_processes;
+
+    // create a buffer that will hold a subset of i indexes
+    int *sub_i_indexes = new int[elements_per_proc];
+
+    // send the indexes to each of the process
+    MPI_Scatter(i_indexes, elements_per_proc, MPI_INT,
+                sub_i_indexes, elements_per_proc, MPI_INT,
+                0, MPI_COMM_WORLD);
 
     double sum = 0.0;
-    for (int i = lower; i < upper; i++) {
+    for (int k = 0; k < elements_per_proc; k++) {
+        int i = sub_i_indexes[k];
+        cout << "num per proc" << elements_per_proc << endl;
+        cout << "i am rank " << rank
+        << " im calculating from i " << sub_i_indexes[0]
+                << "to i " << sub_i_indexes[elements_per_proc-1] << endl;
         double minDistance = numeric_limits<double>::max();
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
