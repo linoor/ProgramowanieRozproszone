@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <mpi.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -95,19 +96,39 @@ void Simulation::getTwoClosestsParticles() {
         // creating a buffer telling each processes how many data it gets
     }
 
-    int elements_per_proc = numberOfParticles / num_of_processes;
+    div_t divider;
+    divider = div(numberOfParticles, num_of_processes);
+
+    // CHUNKSIZES
+    int chunksizes[num_of_processes];
+    for (int i = 0; i < num_of_processes; i++) {
+       chunksizes[i] = divider.quot;
+    }
+    if (divider.rem) {
+        chunksizes[num_of_processes-1] += divider.rem;
+    }
+    // CHUNKSIZES
+
+    // DISPLACEMENTS
+    int displ[num_of_processes];
+    int tmp = 0;
+    for (int i = 0; i < num_of_processes; i++) {
+        displ[i] = tmp;
+        tmp += divider.quot;
+    }
+    // DISPLACEMENTS
 
     // create a buffer that will hold a subset of i indexes
-    int *sub_i_indexes = new int[elements_per_proc];
+    int *sub_i_indexes = new int[chunksizes[rank]];
 
     // send the indexes to each of the process
-    MPI_Scatter(i_indexes, elements_per_proc, MPI_INT,
-                sub_i_indexes, elements_per_proc, MPI_INT,
+    MPI_Scatterv(i_indexes, chunksizes, displ, MPI_INT,
+                sub_i_indexes, chunksizes[rank], MPI_INT,
                 0, MPI_COMM_WORLD);
 
     int results[2];
     double closestDistanceSoFar = numeric_limits<double>::max();
-    for (int k = 0; k < elements_per_proc; k++) {
+    for (int k = 0; k < chunksizes[rank]; k++) {
         int i = sub_i_indexes[k];
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
