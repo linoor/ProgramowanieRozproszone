@@ -48,7 +48,9 @@ void Simulation::remove(int numberOfPairsToRemove) {
 
     while (numberOfPairsToRemove > 0) {
         Simulation::getTwoClosestsParticles();
-        fuseTwoParticles(closestPair[0], closestPair[1]);
+        if (rank == master) {
+            fuseTwoParticles(closestPair[0], closestPair[1]);
+        }
         numberOfPairsToRemove--;
 
         // update the other vectors and number of particles
