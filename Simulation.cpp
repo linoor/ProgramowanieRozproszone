@@ -90,10 +90,6 @@ void Simulation::calcAvgMinDistance(void) {
     double sum = 0.0;
     for (int k = 0; k < elements_per_proc; k++) {
         int i = sub_i_indexes[k];
-        cout << "num per proc" << elements_per_proc << endl;
-        cout << "i am rank " << rank
-        << " im calculating from i " << sub_i_indexes[0]
-                << "to i " << sub_i_indexes[elements_per_proc-1] << endl;
         double minDistance = numeric_limits<double>::max();
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
