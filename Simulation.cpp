@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <mpi.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -66,8 +67,8 @@ void Simulation::calcAvgMinDistance(void) {
     int num_of_processes;
     MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
 
+    //     create a buffer with i indexes
     int *i_indexes;
-    // create a buffer with i indexes
     if (rank == master) {
         i_indexes = new int[numberOfParticles];
         for (int i = 0; i < numberOfParticles; i++) {
@@ -138,10 +139,24 @@ void Simulation::getTwoClosestsParticles() {
         for (int i = 0; i < numberOfParticles; i++) {
             i_indexes[i] = i;
         }
-        // creating a buffer telling each processes how many data it gets
     }
 
     int elements_per_proc = numberOfParticles / num_of_processes;
+    div_t divresult;
+    divresult = div(numberOfParticles, num_of_processes);
+    int chunksizes[num_of_processes];
+    for (int i = 0; i < num_of_processes; i++) {
+        chunksizes[i] = divresult.quot;
+    }
+    if (divresult.rem) {
+        chunksizes[num_of_processes-1] += divresult.rem;
+    }
+
+//    cout << "chunksizes ";
+//    for (int i = 0; i < num_of_processes; i++) {
+//       cout << chunksizes[i] << " ";
+//    }
+//    cout << endl;
 
     // create a buffer that will hold a subset of i indexes
     int *sub_i_indexes = new int[elements_per_proc];
