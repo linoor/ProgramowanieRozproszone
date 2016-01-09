@@ -61,35 +61,8 @@ void Simulation::remove(int numberOfPairsToRemove) {
     }
 }
 void Simulation::calcAvgMinDistance(void) {
-    // Get the rank of the process
-    int rank;
-    const int master = 0;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    int num_of_processes;
-    MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
-
-    int *i_indexes;
-    // create a buffer with i indexes
-    if (rank == master) {
-        i_indexes = new int[numberOfParticles];
-        for (int i = 0; i < numberOfParticles; i++) {
-            i_indexes[i] = i;
-        }
-    }
-
-    int elements_per_proc = numberOfParticles / num_of_processes;
-
-    // create a buffer that will hold a subset of i indexes
-    int *sub_i_indexes = new int[elements_per_proc];
-
-    // send the indexes to each of the process
-    MPI_Scatter(i_indexes, elements_per_proc, MPI_INT,
-                sub_i_indexes, elements_per_proc, MPI_INT,
-                0, MPI_COMM_WORLD);
-
     double sum = 0.0;
-    for (int k = 0; k < elements_per_proc; k++) {
-        int i = sub_i_indexes[k];
+    for (int i = 0; i < numberOfParticles; i++) {
         double minDistance = numeric_limits<double>::max();
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
@@ -101,28 +74,7 @@ void Simulation::calcAvgMinDistance(void) {
         }
         sum += minDistance;
     }
-
-    // create a buffer for the results
-    double *sums;
-    if (rank == master) {
-       sums = new double[num_of_processes];
-    }
-    // receiving data from other processes into the sums buffer
-    MPI_Gather(&sum, 1, MPI_DOUBLE,
-               sums, 1, MPI_DOUBLE,
-               0, MPI_COMM_WORLD);
-
-    // take the average from all of the results
-    if (rank == master) {
-        double allsums = 0;
-        for (int i = 0; i < num_of_processes; i++) {
-            allsums += sums[i];
-        }
-
-        // if the data has not been scattered evenly
-
-        this->avgMinDist = allsums / numberOfParticles;
-    }
+    this->avgMinDist = sum / numberOfParticles;
 }
 
 void Simulation::getTwoClosestsParticles() {
