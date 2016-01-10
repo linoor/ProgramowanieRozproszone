@@ -19,7 +19,7 @@ public class DoNothingPlayer {
 		while (true) {
 			try {
 				int ships = gi.getNumberOfAvaiablewarships(id);
-				System.out.println("Dostepne statki:          " + ships);
+				System.out.println("Dostepne statki: " + ships);
 				if (ships == 0)
 					System.exit(0);
 				Thread.sleep( 1000 );

@@ -4,10 +4,10 @@ import java.rmi.RemoteException;
 
 public interface GameInterface extends Remote {
 	// wartosc ponizszych stalych mogas ulec zmienie, nazwy nie!
-	public final int HIGHT = 30;
-	public final int WIDTH = 10;
+	public final int HIGHT = 22;
+	public final int WIDTH = 7;
 
-	public final long DELAY = 900; // opoznienie bazowe dla realizacji metod
+	public final long DELAY = 500; // opoznienie bazowe dla realizacji metod
 									// move, fire,
 									// turn
 
