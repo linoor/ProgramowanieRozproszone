@@ -62,8 +62,56 @@ void Simulation::remove(int numberOfPairsToRemove) {
     }
 }
 void Simulation::calcAvgMinDistance(void) {
+    // Get the rank of the process
+    int rank;
+    const int master = 0;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    int num_of_processes;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_of_processes);
+
+    int *i_indexes;
+    // create a buffer with i indexes
+    if (rank == master) {
+        i_indexes = new int[numberOfParticles];
+        for (int i = 0; i < numberOfParticles; i++) {
+            i_indexes[i] = i;
+        }
+        // creating a buffer telling each processes how many data it gets
+    }
+
+    div_t divider;
+    divider = div(numberOfParticles, num_of_processes);
+
+    // CHUNKSIZES
+    int chunksizes[num_of_processes];
+    for (int i = 0; i < num_of_processes; i++) {
+        chunksizes[i] = divider.quot;
+    }
+    if (divider.rem) {
+        chunksizes[num_of_processes-1] += divider.rem;
+    }
+    // CHUNKSIZES
+
+    // DISPLACEMENTS
+    int displ[num_of_processes];
+    int tmp = 0;
+    for (int i = 0; i < num_of_processes; i++) {
+        displ[i] = tmp;
+        tmp += divider.quot;
+    }
+    // DISPLACEMENTS
+
+    // create a buffer that will hold a subset of i indexes
+    int *sub_i_indexes = new int[chunksizes[rank]];
+
+    // send the indexes to each of the process
+    MPI_Scatterv(i_indexes, chunksizes, displ, MPI_INT,
+                 sub_i_indexes, chunksizes[rank], MPI_INT,
+                 0, MPI_COMM_WORLD);
+
     double sum = 0.0;
-    for (int i = 0; i < numberOfParticles; i++) {
+    for (int k = 0; k < chunksizes[rank]; k++) {
+        int i = sub_i_indexes[k];
         double minDistance = numeric_limits<double>::max();
         for (int j = 0; j < numberOfParticles; j++) {
             if (i == j) continue;
@@ -75,7 +123,25 @@ void Simulation::calcAvgMinDistance(void) {
         }
         sum += minDistance;
     }
-    this->avgMinDist = sum / numberOfParticles;
+    // create a buffer for the results
+    double *sums;
+    if (rank == master) {
+        sums = new double[num_of_processes];
+    }
+    // receiving data from other processes into the sums buffer
+    MPI_Gather(&sum, 1, MPI_DOUBLE,
+               sums, 1, MPI_DOUBLE,
+               0, MPI_COMM_WORLD);
+
+    // process all of the pairs that you got
+    if (rank == master) {
+        double global_sum = 0.0;
+        for (int i = 0; i < num_of_processes; i++) {
+            global_sum += sums[i];
+        }
+
+        this->avgMinDist = global_sum / numberOfParticles;
+    }
 }
 
 void Simulation::getTwoClosestsParticles() {
