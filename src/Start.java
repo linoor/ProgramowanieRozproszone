@@ -23,7 +23,6 @@ public class Start {
             try {
                 int ships = gi.getNumberOfAvaiablewarships(id);
                 System.out.println("Dostepne statki: " + ships);
-                gi.move(id, 0);
                 if (ships == 0)
                     System.exit(0);
                 Thread.sleep( 1000 );
