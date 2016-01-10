@@ -9,9 +9,9 @@ public class DebugClient {
 		DebugInterface gi = (DebugInterface) Naming.lookup("DEBUG");
 		
 		while ( true ) {
-			System.out.println( gi.getBoardState() );
+			System.out.println( gi.getBoardState( "aplipapli" ) );
 			try {	
-				Thread.sleep( 750 );
+				Thread.sleep( 1000 );
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
