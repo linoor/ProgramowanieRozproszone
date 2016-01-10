@@ -28,6 +28,7 @@ public class Start {
                     System.exit(0);
                 Thread.sleep( 1000 );
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 System.exit(0);
             }
         }

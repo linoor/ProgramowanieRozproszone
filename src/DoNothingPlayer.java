@@ -24,7 +24,8 @@ public class DoNothingPlayer {
 					System.exit(0);
 				Thread.sleep( 1000 );
 			} catch (Exception e) {
-				System.exit(0);
+                System.out.println(e.getMessage());
+                System.exit(0);
 			}
 		}
 	}
