@@ -19,10 +19,13 @@ public class Start {
         System.out.println("Wait for start...");
         gi.waitForStart(id);
 
+        Ship ship = new UpAndDownShip(id, gi, 0);
+
         while (true) {
             try {
                 int ships = gi.getNumberOfAvaiablewarships(id);
                 System.out.println("Dostepne statki: " + ships);
+                ship.step();
                 if (ships == 0)
                     System.exit(0);
                 Thread.sleep( 1000 );
