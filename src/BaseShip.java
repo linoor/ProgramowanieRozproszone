@@ -24,13 +24,21 @@ public class BaseShip {
         GameInterface.Position position = gi.getPosition(playerId, warshipId);
         GameInterface.Course course     = gi.getCourse(playerId, warshipId);
 
-        System.out.println("before");
-        position.getCol();
-        System.out.println("after");
         // check that you won't get outside the board
         if (position.getCol() == (GameInterface.HIGHT-1)) {
             System.out.println(String.format("The ship %d can't go any further up", warshipId));
             return false;
+        }
+
+        // check that you won't bump into other ship
+        // stop if there is another ship near above you
+        for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
+            GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
+            if (otherShipPosition.getCol() == position.getCol() &&
+                otherShipPosition.getRow() - position.getRow() < 2 &&
+                otherShipPosition.getRow() - position.getRow() > 0) {
+                return false;
+            }
         }
 
         // change the course to go up

@@ -12,9 +12,8 @@ public class UpAndDownShip extends BaseShip implements Ship {
     public void step() throws RemoteException {
         GameInterface.Position currentPosition = gi.getPosition(super.playerId, super.warshipId);
         // test - go up until the top of the board
-        System.out.println("before go up");
+        System.out.println(String.format("Ship %d: %d %d", warshipId, currentPosition.getRow(), currentPosition.getCol()));
         goUp();
-        System.out.println("after go up");
         // check that you are on your own lane
         // go up
         // fire every two steps
