@@ -14,6 +14,13 @@ public class UpAndDownShip extends BaseShip implements Ship {
         // test - go up until the top of the board
         System.out.println(String.format("Ship %d: %d %d", warshipId, currentPosition.getRow(), currentPosition.getCol()));
         goUp();
+
+        System.out.println("BEFORE detecting ship");
+        GameInterface.PositionAndCourse positionAndCourse = thereIsShipNearby();
+        System.out.println("after detecting ship");
+        if (positionAndCourse != null) {
+            fire(positionAndCourse.getPosition());
+        }
         // check that you are on your own lane
         // go up
         // fire every two steps

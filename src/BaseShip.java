@@ -77,19 +77,29 @@ public class BaseShip {
     }
 
     /**
+     *
+     * @return null if there is no ship nearby
+     * positio and course if there is a ship nearby
+     * @throws RemoteException
+     */
+    public GameInterface.PositionAndCourse thereIsShipNearby() throws RemoteException {
+        System.out.println("before checking the message queue");
+        if (gi.messageQueueSize(playerId, warshipId) > 0) {
+            System.out.println("A SHIP HAS BEEN DETECTED");
+            GameInterface.PositionAndCourse positionAndCourse = gi.getMessage(playerId, warshipId);
+            // TODO check that it's close enough
+            return positionAndCourse;
+        }
+        System.out.println("NO SHIP DETECTED");
+        return null;
+    }
+
+    /**
      * fire method wrapper
      * @param target
      * @throws RemoteException
      */
     public void fire(GameInterface.Position target) throws RemoteException {
         gi.fire(playerId, warshipId, target);
-    }
-
-    public void addToQueue(GameInterface.PositionAndCourse positionAndCourse) {
-        detectedShips.add(positionAndCourse);
-    }
-
-    public GameInterface.PositionAndCourse getDetectedShip() {
-        return detectedShips.remove();
     }
 }
