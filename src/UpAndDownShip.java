@@ -5,6 +5,8 @@ import java.rmi.RemoteException;
  */
 public class UpAndDownShip extends BaseShip implements Ship {
 
+    boolean goingUp = true;
+
     public UpAndDownShip(long playerId, GameInterface gi, int warshipId) {
         super(playerId, gi, warshipId);
     }
@@ -12,12 +14,14 @@ public class UpAndDownShip extends BaseShip implements Ship {
     public void step() throws RemoteException {
         GameInterface.Position currentPosition = gi.getPosition(super.playerId, super.warshipId);
         // test - go up until the top of the board
-        System.out.println(String.format("Ship %d: %d %d", warshipId, currentPosition.getRow(), currentPosition.getCol()));
-        goUp();
+        // change the direction when at the top
+        if (goingUp) {
+            goingUp = goUp();
+        } else {
+            goingUp = !goDown();
+        }
 
-        System.out.println("BEFORE detecting ship");
         GameInterface.PositionAndCourse positionAndCourse = thereIsShipNearby();
-        System.out.println("after detecting ship");
         if (positionAndCourse != null) {
             fire(positionAndCourse.getPosition());
         }
