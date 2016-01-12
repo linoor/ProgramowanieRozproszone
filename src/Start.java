@@ -20,18 +20,43 @@ public class Start {
         gi.waitForStart(id);
 
         Ship ship = new UpAndDownShip(id, gi, 0);
+        Ship ship2 = new UpAndDownShip(id, gi, 1);
+
+        new Thread(new ShipThread(ship)).start();
+        new Thread(new ShipThread(ship2)).start();
 
         while (true) {
             try {
                 int ships = gi.getNumberOfAvaiablewarships(id);
                 System.out.println("Dostepne statki: " + ships);
-                ship.step();
                 if (ships == 0)
                     System.exit(0);
                 Thread.sleep( 1000 );
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 System.exit(0);
+            }
+        }
+    }
+
+    private static class ShipThread implements Runnable {
+
+        private Ship ship;
+
+        public ShipThread(Ship ship) {
+           this.ship = ship;
+        }
+
+        public void run() {
+            while (true)  {
+                try {
+                    ship.step();
+                } catch (RemoteException e) {
+                    System.out.println("there has been an error when trying to do a step");
+                    e.printStackTrace();
+//                    break;
+                    System.exit(0);
+                }
             }
         }
     }

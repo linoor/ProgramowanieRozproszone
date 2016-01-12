@@ -22,9 +22,18 @@ public class UpAndDownShip extends BaseShip implements Ship {
         }
 
         GameInterface.PositionAndCourse positionAndCourse = thereIsShipNearby();
-        if (positionAndCourse != null) {
-            fire(positionAndCourse.getPosition());
+//        if (positionAndCourse != null) {
+//            fire(positionAndCourse.getPosition());
+//        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+//        if (positionAndCourse != null) {
+//            fire(positionAndCourse.getPosition());
+//        }
+        System.out.println("step");
         // TODO change lane
     }
 }
