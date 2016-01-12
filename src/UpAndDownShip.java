@@ -25,10 +25,6 @@ public class UpAndDownShip extends BaseShip implements Ship {
         if (positionAndCourse != null) {
             fire(positionAndCourse.getPosition());
         }
-        // check that you are on your own lane
-        // go up
-        // fire every two steps
-        // go down
-        // repeat
+        // TODO change lane
     }
 }
