@@ -1,4 +1,6 @@
 import java.rmi.RemoteException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Created by linoor on 1/10/16.
@@ -8,6 +10,8 @@ public class BaseShip {
     protected GameInterface gi;
     protected long playerId;
     protected int warshipId;
+
+    Queue<GameInterface.PositionAndCourse> detectedShips = new LinkedList<GameInterface.PositionAndCourse>();
 
     public BaseShip(long playerId, GameInterface gi, int warshipId) {
         this.playerId = playerId;
@@ -70,5 +74,22 @@ public class BaseShip {
 
     public void goDown() {
 
+    }
+
+    /**
+     * fire method wrapper
+     * @param target
+     * @throws RemoteException
+     */
+    public void fire(GameInterface.Position target) throws RemoteException {
+        gi.fire(playerId, warshipId, target);
+    }
+
+    public void addToQueue(GameInterface.PositionAndCourse positionAndCourse) {
+        detectedShips.add(positionAndCourse);
+    }
+
+    public GameInterface.PositionAndCourse getDetectedShip() {
+        return detectedShips.remove();
     }
 }
