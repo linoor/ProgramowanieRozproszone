@@ -11,12 +11,25 @@ public class BaseShip {
     protected long playerId;
     protected int warshipId;
 
+    protected int myColumn;
+    protected int myRow;
+
     Queue<GameInterface.PositionAndCourse> detectedShips = new LinkedList<GameInterface.PositionAndCourse>();
 
     public BaseShip(long playerId, GameInterface gi, int warshipId) {
         this.playerId = playerId;
         this.gi = gi;
         this.warshipId = warshipId;
+
+        GameInterface.Position position = null;
+        try {
+            position = gi.getPosition(playerId, warshipId);
+            myColumn = position.getCol();
+            myRow    = position.getRow();
+        } catch (RemoteException e) {
+            System.out.println("problem with getting position in the constructor");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -29,7 +42,7 @@ public class BaseShip {
         GameInterface.Course course     = gi.getCourse(playerId, warshipId);
 
         // check that you won't get outside the board
-        if (position.getCol() == (GameInterface.HIGHT-1)) {
+        if (myColumn >= (GameInterface.HIGHT-1)) {
             System.out.println(String.format("The ship %d can't go any further up", warshipId));
             return false;
         }
@@ -60,6 +73,7 @@ public class BaseShip {
 
         }
 
+        myColumn += 1;
         gi.move(playerId, warshipId);
         return true;
     }
