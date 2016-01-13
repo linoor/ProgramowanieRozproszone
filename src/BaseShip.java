@@ -19,6 +19,15 @@ public class BaseShip {
         this.warshipId = warshipId;
     }
 
+    public void waitUntilCourseIs(String course) throws RemoteException {
+        while (true) {
+            GameInterface.Course tmpCourse = gi.getCourse(playerId, warshipId);
+            if (tmpCourse.fullCourseName().equals(course)) {
+                break;
+            }
+        }
+    }
+
     /**
      *
      * @return true if move successful
@@ -39,7 +48,7 @@ public class BaseShip {
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
-                otherShipPosition.getRow() - position.getRow() < 2 &&
+                otherShipPosition.getRow() - position.getRow() < 4 &&
                 otherShipPosition.getRow() - position.getRow() > 0) {
                 return false;
             }
@@ -49,9 +58,11 @@ public class BaseShip {
         String courseName = course.fullCourseName();
         if (courseName.equals("WEST")) {
             gi.turnRight(playerId, warshipId);
+            waitUntilCourseIs("NORTH");
             gi.move(playerId, warshipId);
         } else if (courseName.equals("EAST")) {
             gi.turnLeft(playerId, warshipId);
+            waitUntilCourseIs("NORTH");
             gi.move(playerId, warshipId);
 
         } else if (courseName.equals("NORTH")) {
@@ -59,6 +70,7 @@ public class BaseShip {
         } else if (courseName.equals("SOUTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
+            waitUntilCourseIs("NORTH");
             gi.move(playerId, warshipId);
         }
 
@@ -88,7 +100,7 @@ public class BaseShip {
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
-                otherShipPosition.getRow() - position.getRow() > -2 &&
+                otherShipPosition.getRow() - position.getRow() > -4 &&
                 otherShipPosition.getRow() - position.getRow() < 0) {
                 return false;
             }
@@ -98,13 +110,16 @@ public class BaseShip {
         String courseName = course.fullCourseName();
         if (courseName.equals("WEST")) {
             gi.turnLeft(playerId, warshipId);
+            waitUntilCourseIs("SOUTH");
             gi.move(playerId, warshipId);
         } else if (courseName.equals("EAST")) {
             gi.turnRight(playerId, warshipId);
+            waitUntilCourseIs("SOUTH");
             gi.move(playerId, warshipId);
         } else if (courseName.equals("NORTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
+            waitUntilCourseIs("SOUTH");
             gi.move(playerId, warshipId);
         } else if (courseName.equals("SOUTH")) {
             gi.move(playerId, warshipId);
