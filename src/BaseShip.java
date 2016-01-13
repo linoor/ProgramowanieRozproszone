@@ -136,6 +136,14 @@ public class BaseShip {
      * @throws RemoteException
      */
     public void fire(GameInterface.Position target) throws RemoteException {
+        // check for friendly fire
+        for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
+            GameInterface.Position friendlyShip = gi.getPosition(playerId, i);
+            if (friendlyShip.getRow() == target.getRow() &&
+                friendlyShip.getCol() == target.getCol()) {
+                return;
+            }
+        }
         gi.fire(playerId, warshipId, target);
     }
 }
