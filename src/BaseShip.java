@@ -48,7 +48,7 @@ public class BaseShip {
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
-                otherShipPosition.getRow() - position.getRow() < 4 &&
+                otherShipPosition.getRow() - position.getRow() < 2 &&
                 otherShipPosition.getRow() - position.getRow() > 0) {
                 return false;
             }
@@ -100,7 +100,7 @@ public class BaseShip {
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
-                otherShipPosition.getRow() - position.getRow() > -4 &&
+                otherShipPosition.getRow() - position.getRow() > -2 &&
                 otherShipPosition.getRow() - position.getRow() < 0) {
                 return false;
             }
