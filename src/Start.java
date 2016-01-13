@@ -25,6 +25,16 @@ public class Start {
         new Thread(new ShipThread(ship)).start();
         new Thread(new ShipThread(ship2)).start();
 
+        // start all of the ship threads
+        for (int i = 0; i < gi.getNumberOfAvaiablewarships(id); i++) {
+            try {
+                Thread.sleep(500);
+                new Thread(new ShipThread(new UpAndDownShip(id, gi, i))).start();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         while (true) {
             try {
                 int ships = gi.getNumberOfAvaiablewarships(id);
@@ -52,7 +62,8 @@ public class Start {
                 try {
                     ship.step();
                 } catch (RemoteException e) {
-                    System.out.println("there has been an error when trying to do a step");
+                    System.out.println();
+                    System.out.println(e.getMessage());
                     e.printStackTrace();
 //                    break;
                     System.exit(0);

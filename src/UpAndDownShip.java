@@ -26,14 +26,13 @@ public class UpAndDownShip extends BaseShip implements Ship {
             fire(positionAndCourse.getPosition());
         }
         try {
-            Thread.sleep(500);
+            Thread.sleep(700);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         if (positionAndCourse != null) {
             fire(positionAndCourse.getPosition());
         }
-        System.out.println("step");
         // TODO change lane
     }
 }

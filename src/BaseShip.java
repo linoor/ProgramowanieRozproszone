@@ -24,7 +24,7 @@ public class BaseShip {
      * @return true if move successful
      * @throws RemoteException
      */
-    public boolean goUp() throws RemoteException {
+    public synchronized boolean goUp() throws RemoteException {
         GameInterface.Position position = gi.getPosition(playerId, warshipId);
         GameInterface.Course course     = gi.getCourse(playerId, warshipId);
 
@@ -73,7 +73,7 @@ public class BaseShip {
 
     }
 
-    public boolean goDown() throws RemoteException {
+    public synchronized boolean goDown() throws RemoteException {
         GameInterface.Position position = gi.getPosition(playerId, warshipId);
         GameInterface.Course course     = gi.getCourse(playerId, warshipId);
 
@@ -119,14 +119,11 @@ public class BaseShip {
      * @throws RemoteException
      */
     public GameInterface.PositionAndCourse thereIsShipNearby() throws RemoteException {
-        System.out.println("before checking the message queue");
         if (gi.messageQueueSize(playerId, warshipId) > 0) {
-            System.out.println("A SHIP HAS BEEN DETECTED");
             GameInterface.PositionAndCourse positionAndCourse = gi.getMessage(playerId, warshipId);
             // TODO check that it's close enough
             return positionAndCourse;
         }
-        System.out.println("NO SHIP DETECTED");
         return null;
     }
 
