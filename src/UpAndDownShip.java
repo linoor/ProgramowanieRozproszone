@@ -11,7 +11,7 @@ public class UpAndDownShip extends BaseShip implements Ship {
         super(playerId, gi, warshipId);
     }
 
-    public void step() throws RemoteException {
+    public synchronized void step() throws RemoteException {
         GameInterface.Position currentPosition = gi.getPosition(super.playerId, super.warshipId);
         // test - go up until the top of the board
         // change the direction when at the top

@@ -49,19 +49,19 @@ public class BaseShip {
         String courseName = course.fullCourseName();
         if (courseName.equals("WEST")) {
             gi.turnRight(playerId, warshipId);
-
+            gi.move(playerId, warshipId);
         } else if (courseName.equals("EAST")) {
             gi.turnLeft(playerId, warshipId);
+            gi.move(playerId, warshipId);
 
         } else if (courseName.equals("NORTH")) {
-            // it's the right course
+            gi.move(playerId, warshipId);
         } else if (courseName.equals("SOUTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
-
+            gi.move(playerId, warshipId);
         }
 
-        gi.move(playerId, warshipId);
         return true;
     }
 
@@ -98,18 +98,18 @@ public class BaseShip {
         String courseName = course.fullCourseName();
         if (courseName.equals("WEST")) {
             gi.turnLeft(playerId, warshipId);
-
+            gi.move(playerId, warshipId);
         } else if (courseName.equals("EAST")) {
             gi.turnRight(playerId, warshipId);
-
+            gi.move(playerId, warshipId);
         } else if (courseName.equals("NORTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
+            gi.move(playerId, warshipId);
         } else if (courseName.equals("SOUTH")) {
-            // it's the right course
+            gi.move(playerId, warshipId);
         }
 
-        gi.move(playerId, warshipId);
         return true;    }
 
     /**
