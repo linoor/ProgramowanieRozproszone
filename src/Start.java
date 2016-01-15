@@ -19,15 +19,8 @@ public class Start {
         System.out.println("Wait for start...");
         gi.waitForStart(id);
 
-        Ship ship = new UpAndDownShip(id, gi, 0);
-        Ship ship2 = new UpAndDownShip(id, gi, 1);
-
-        new Thread(new ShipThread(ship)).start();
-        new Thread(new ShipThread(ship2)).start();
-
         // start all of the ship threads
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(id); i++) {
-            //                Thread.sleep(500);
             new Thread(new ShipThread(new UpAndDownShip(id, gi, i))).start();
         }
 
