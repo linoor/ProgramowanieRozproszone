@@ -27,12 +27,8 @@ public class Start {
 
         // start all of the ship threads
         for (int i = 0; i < gi.getNumberOfAvaiablewarships(id); i++) {
-            try {
-                Thread.sleep(500);
-                new Thread(new ShipThread(new UpAndDownShip(id, gi, i))).start();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            //                Thread.sleep(500);
+            new Thread(new ShipThread(new UpAndDownShip(id, gi, i))).start();
         }
 
         while (true) {

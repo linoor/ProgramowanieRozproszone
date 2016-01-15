@@ -59,22 +59,24 @@ public class BaseShip {
         if (courseName.equals("WEST")) {
             gi.turnRight(playerId, warshipId);
             waitUntilCourseIs("NORTH");
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         } else if (courseName.equals("EAST")) {
             gi.turnLeft(playerId, warshipId);
             waitUntilCourseIs("NORTH");
-            gi.move(playerId, warshipId);
-
+            move();
+            return true;
         } else if (courseName.equals("NORTH")) {
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         } else if (courseName.equals("SOUTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
             waitUntilCourseIs("NORTH");
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         }
-
-        return true;
+        return false;
     }
 
     public void goRight() {
@@ -111,21 +113,27 @@ public class BaseShip {
         if (courseName.equals("WEST")) {
             gi.turnLeft(playerId, warshipId);
             waitUntilCourseIs("SOUTH");
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         } else if (courseName.equals("EAST")) {
             gi.turnRight(playerId, warshipId);
             waitUntilCourseIs("SOUTH");
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         } else if (courseName.equals("NORTH")) {
             gi.turnLeft(playerId, warshipId);
             gi.turnLeft(playerId, warshipId);
             waitUntilCourseIs("SOUTH");
-            gi.move(playerId, warshipId);
+            move();
+            return true;
         } else if (courseName.equals("SOUTH")) {
-            gi.move(playerId, warshipId);
+            waitUntilCourseIs("SOUTH");
+            move();
+            return true;
         }
 
-        return true;    }
+        return true;
+    }
 
     /**
      *
@@ -157,5 +165,14 @@ public class BaseShip {
             }
         }
         gi.fire(playerId, warshipId, target);
+    }
+
+    public void move() throws RemoteException {
+        if (warshipId == 0) {
+            GameInterface.Position position = gi.getPosition(playerId, warshipId);
+            System.out.println(String.format("row: %d, column: %d", position.getRow(), position.getCol()));
+            System.out.println(String.format("Ship %d moving", warshipId));
+        }
+        gi.move(playerId, warshipId);
     }
 }
