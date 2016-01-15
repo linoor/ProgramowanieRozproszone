@@ -53,9 +53,7 @@ public class Start {
                 } catch (RemoteException e) {
                     System.out.println();
                     System.out.println(e.getMessage());
-                    e.printStackTrace();
-//                    break;
-                    System.exit(0);
+                    break;
                 }
             }
         }
