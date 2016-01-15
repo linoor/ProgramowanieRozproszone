@@ -17,7 +17,7 @@ gnome-terminal --geometry=80x16+16+446 -t "my player" -x bash -c "java Start myp
 echo $! >> $pid_file
 sleep 1
 # run the first player
-gnome-terminal --geometry=80x16+701-97 -t "do nothing player" -x bash -c "java DoNothingPlayer something; bash" &
+gnome-terminal --geometry=80x16+701-97 -t "random player" -x bash -c "java RandomPlayer randomPlayer; bash" &
 echo $! >> $pid_file
 # run the debugger
 gnome-terminal --geometry=80x28+629+4 -t "debugger" -x bash -c "java DebugClient; bash" &
