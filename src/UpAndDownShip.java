@@ -12,12 +12,15 @@ public class UpAndDownShip extends BaseShip implements Ship {
     }
 
     public synchronized void step() throws RemoteException {
+        if (!gi.isAlive(playerId, warshipId)) {
+           return;
+        }
         GameInterface.Position currentPosition = gi.getPosition(super.playerId, super.warshipId);
         goUp();
 
         GameInterface.PositionAndCourse positionAndCourse = thereIsShipNearby();
         if (positionAndCourse != null) {
-            fire(positionAndCourse.getPosition());
+//                fire(positionAndCourse.getPosition());
         }
         try {
             Thread.sleep(700);
@@ -25,8 +28,7 @@ public class UpAndDownShip extends BaseShip implements Ship {
             e.printStackTrace();
         }
         if (positionAndCourse != null) {
-            fire(positionAndCourse.getPosition());
+//                fire(positionAndCourse.getPosition());
         }
-        // TODO change lane
     }
 }

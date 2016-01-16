@@ -7,13 +7,19 @@ import java.rmi.RemoteException;
  * Created by linoor on 1/10/16.
  */
 public class Start {
+
+    private static GameInterface gameInterface;
+    private static long playerId;
+
     public static void main(String[] args) throws MalformedURLException,
             RemoteException, NotBoundException {
         GameInterface gi = (GameInterface) Naming.lookup("GAME");
+        gameInterface = gi;
 
         System.out.println("Game interface proxy " + gi);
 
         long id = gi.register(args[0]);
+        playerId = id;
         System.out.println("My ID = " + id);
 
         System.out.println("Wait for start...");
@@ -30,31 +36,9 @@ public class Start {
                 System.out.println("Dostepne statki: " + ships);
                 if (ships == 0)
                     System.exit(0);
-                Thread.sleep( 1000 );
+                Thread.sleep(1000);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
-            }
-        }
-    }
-
-    private static class ShipThread implements Runnable {
-
-        private Ship ship;
-
-        public ShipThread(Ship ship) {
-           this.ship = ship;
-        }
-
-        public void run() {
-            while (true)  {
-                try {
-                    ship.step();
-                } catch (RemoteException e) {
-                    System.out.println();
-                    System.out.println(e.getMessage());
-                    break;
-                }
+                System.out.println("Exception in the loop checking available ships");
             }
         }
     }

@@ -143,9 +143,7 @@ public class BaseShip {
      */
     public GameInterface.PositionAndCourse thereIsShipNearby() throws RemoteException {
         if (gi.messageQueueSize(playerId, warshipId) > 0) {
-            GameInterface.PositionAndCourse positionAndCourse = gi.getMessage(playerId, warshipId);
-            // TODO check that it's close enough
-            return positionAndCourse;
+            return gi.getMessage(playerId, warshipId);
         }
         return null;
     }
@@ -168,11 +166,6 @@ public class BaseShip {
     }
 
     public void move() throws RemoteException {
-        if (warshipId == 0) {
-            GameInterface.Position position = gi.getPosition(playerId, warshipId);
-            System.out.println(String.format("row: %d, column: %d", position.getRow(), position.getCol()));
-            System.out.println(String.format("Ship %d moving", warshipId));
-        }
         gi.move(playerId, warshipId);
     }
 }
