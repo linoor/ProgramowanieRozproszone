@@ -306,7 +306,8 @@ public class PMO_Server implements GameInterface, DebugInterface {
 	public Position getPosition(long playerID, int warshipID)
 			throws RemoteException {
 		testIDsAndShip(playerID, warshipID);
-		return fleet.get(playerID).getShip(warshipID).getUniversalPosition();
+		//return fleet.get(playerID).getShip(warshipID).getUniversalPosition();
+		return fleet.get(playerID).getShip(warshipID).getPosition();
 	}
 
 	@Override
