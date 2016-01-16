@@ -16,6 +16,7 @@ public class ShipThread implements Runnable {
             try {
                 ship.step();
             } catch (RemoteException e) {
+                System.out.println("There has been an error when trying to do a step");
             }
         }
     }

@@ -5,5 +5,4 @@ import java.rmi.RemoteException;
  */
 public interface Ship {
     public void step() throws RemoteException;
-    public boolean isAlive() throws RemoteException;
 }
