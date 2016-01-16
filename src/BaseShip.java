@@ -1,6 +1,4 @@
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Created by linoor on 1/10/16.
@@ -10,13 +8,16 @@ public class BaseShip {
     protected GameInterface gi;
     protected long playerId;
     protected int warshipId;
+    protected static int numberOfShips = 0;
 
-    Queue<GameInterface.PositionAndCourse> detectedShips = new LinkedList<GameInterface.PositionAndCourse>();
-
-    public BaseShip(long playerId, GameInterface gi, int warshipId) {
+    public BaseShip(long playerId, GameInterface gi, int warshipId) throws RemoteException {
         this.playerId = playerId;
         this.gi = gi;
         this.warshipId = warshipId;
+
+        if (numberOfShips == 0) {
+            numberOfShips = gi.getNumberOfAvaiablewarships(playerId);
+        }
     }
 
     public void waitUntilCourseIs(String course) throws RemoteException {
@@ -45,7 +46,10 @@ public class BaseShip {
 
         // check that you won't bump into other ship
         // stop if there is another ship near above you
-        for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
+        for (int i = 0; i < numberOfShips; i++) {
+            if (!gi.isAlive(playerId, i)) {
+                continue;
+            }
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
                 otherShipPosition.getRow() - position.getRow() < 2 &&
@@ -99,7 +103,10 @@ public class BaseShip {
 
         // check that you won't bump into other ship
         // stop if there is another ship near above you
-        for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
+        for (int i = 0; i < numberOfShips; i++) {
+            if (!gi.isAlive(playerId, i)) {
+                continue;
+            }
             GameInterface.Position otherShipPosition = gi.getPosition(playerId, i);
             if (otherShipPosition.getCol() == position.getCol() &&
                 otherShipPosition.getRow() - position.getRow() > -2 &&
@@ -155,7 +162,10 @@ public class BaseShip {
      */
     public void fire(GameInterface.Position target) throws RemoteException {
         // check for friendly fire
-        for (int i = 0; i < gi.getNumberOfAvaiablewarships(playerId); i++) {
+        for (int i = 0; i < numberOfShips; i++) {
+            if (!gi.isAlive(playerId, i)) {
+                continue;
+            }
             GameInterface.Position friendlyShip = gi.getPosition(playerId, i);
             if (friendlyShip.getRow() == target.getRow() &&
                 friendlyShip.getCol() == target.getCol()) {

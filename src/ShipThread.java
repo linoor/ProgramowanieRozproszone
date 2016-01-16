@@ -16,9 +16,6 @@ public class ShipThread implements Runnable {
             try {
                 ship.step();
             } catch (RemoteException e) {
-                System.out.println(e.getMessage());
-                System.out.println(e.getStackTrace());
-                System.exit(0);
             }
         }
     }
