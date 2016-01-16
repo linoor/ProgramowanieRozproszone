@@ -18,16 +18,11 @@ public class UpAndDownShip extends BaseShip implements Ship {
         GameInterface.Position currentPosition = gi.getPosition(super.playerId, super.warshipId);
         goUp();
 
-        GameInterface.PositionAndCourse positionAndCourse = thereIsShipNearby();
+        GameInterface.PositionAndCourse positionAndCourse = isThereShipNearby();
         if (positionAndCourse != null) {
+            try {
 //                fire(positionAndCourse.getPosition());
-        }
-        try {
-            Thread.sleep(700);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if (positionAndCourse != null) {
+                Thread.sleep(700);
 //                fire(positionAndCourse.getPosition());
         }
     }

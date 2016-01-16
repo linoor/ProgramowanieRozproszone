@@ -141,7 +141,7 @@ public class BaseShip {
      * positio and course if there is a ship nearby
      * @throws RemoteException
      */
-    public GameInterface.PositionAndCourse thereIsShipNearby() throws RemoteException {
+    public GameInterface.PositionAndCourse isThereShipNearby() throws RemoteException {
         if (gi.messageQueueSize(playerId, warshipId) > 0) {
             return gi.getMessage(playerId, warshipId);
         }
