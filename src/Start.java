@@ -2,6 +2,8 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 /**
  * Created by linoor on 1/10/16.
@@ -13,12 +15,15 @@ public class Start {
 
     public static void main(String[] args) throws MalformedURLException,
             RemoteException, NotBoundException {
+        String host = (args.length < 1) ? null : args[0];
+        Registry registry = LocateRegistry.getRegistry(host);
+
         GameInterface gi = (GameInterface) Naming.lookup("GAME");
         gameInterface = gi;
 
         System.out.println("Game interface proxy " + gi);
 
-        long id = gi.register(args[0]);
+        long id = gi.register("Michał Pomarański");
         playerId = id;
         System.out.println("My ID = " + id);
 
