@@ -6,6 +6,8 @@
 
 #include <omp.h>
 
+using namespace std;
+
 Minimum::Minimum( Function *f, double min, double max ) : min( min ), max( max ), f(f) {
    bestX = bestY = bestZ = ( min + max ) * 0.5;
    bestV = f->value( bestX, bestY, bestZ );
@@ -45,51 +47,66 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   
   double x, y, z, v, r, xnew, ynew, znew, vnew, dr;
   int idleSteps = 0;  // liczba krokow, ktore nie poprawily lokalizacji
+
+  struct drand48_data drand_buff;
+  int seed;
+  double random_1 = 0.0;
+  double random_2 = 0.0;
+  double random_3 = 0.0;
   
-  while ( hasTimeToContinue() ) {
-  // inicjujemy losowo polozenie startowe w obrebie kwadratu o bokach od min do max 
-    x = (double)random() * ( max - min ) / RAND_MAX + min;
-    y = (double)random() * ( max - min ) / RAND_MAX + min;
-    z = (double)random() * ( max - min ) / RAND_MAX + min;
-    
-    v = f->value( x, y, z ); // wartosc funkcji w punkcie startowym
-  
-    idleSteps = 0;
-    dr = dr_ini;        
-        
-    while ( dr > dr_fin ) { 
-       xnew = x + ( random()%2 - 2 ) * dr;
-       ynew = y + ( random()%2 - 2 ) * dr;
-       znew = z + ( random()%2 - 2 ) * dr;
-              
-       // upewniamy sie, ze nie opuscilismy przestrzeni poszukiwania rozwiazania
-       xnew = limit( xnew );
-       ynew = limit( ynew );
-       znew = limit( znew );
-       
-       // wartosc funkcji w nowym polozeniu
-       vnew = f->value( xnew, ynew, znew );
-       
-       if ( vnew < v ) {
-         x = xnew;  // przenosimy sie do nowej, lepszej lokalizacji
-         y = ynew;
-         z = znew;
-         v = vnew;
-         idleSteps = 0; // resetujemy licznik krokow, bez poprawy polozenia
-       } else {
-         idleSteps++; // nic sie nie stalo
-         dr *= 0.5; // zmniejszamy 2x dr
-       }
-    } // dr wciaz za duze
-   
-   if ( v < bestV ) {  // znalezlismy najlepsze polozenie globalnie
-      bestV = v;
-      bestX = x;
-      bestY = y;
-      bestZ = z;
-      
-      std::cout << "New better position: " << x << ", " << y << ", " << z << " value = " << v << std::endl;
-   }   
-  } // mamy czas na obliczenia
-  
+  #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, drand_buff)
+  {
+    seed = time(NULL) + omp_get_thread_num();
+    srand48_r(seed, &drand_buff);
+
+    while (hasTimeToContinue()) {
+        drand48_r(&drand_buff, &random_1);
+        drand48_r(&drand_buff, &random_2);
+        drand48_r(&drand_buff, &random_3);
+
+        // inicjujemy losowo polozenie startowe w obrebie kwadratu o bokach od min do max
+        x = random_1 * ( max - min ) + min;
+        y = random_2 * ( max - min ) + min;
+        z = random_3 * ( max - min ) + min;
+
+        v = f->value(x, y, z); // wartosc funkcji w punkcie startowym
+
+        idleSteps = 0;
+        dr = dr_ini;
+
+        while (dr > dr_fin) {
+            xnew = x + (random() % 2 - 2) * dr;
+            ynew = y + (random() % 2 - 2) * dr;
+            znew = z + (random() % 2 - 2) * dr;
+
+            // upewniamy sie, ze nie opuscilismy przestrzeni poszukiwania rozwiazania
+            xnew = limit(xnew);
+            ynew = limit(ynew);
+            znew = limit(znew);
+
+            // wartosc funkcji w nowym polozeniu
+            vnew = f->value(xnew, ynew, znew);
+
+            if (vnew < v) {
+                x = xnew;  // przenosimy sie do nowej, lepszej lokalizacji
+                y = ynew;
+                z = znew;
+                v = vnew;
+                idleSteps = 0; // resetujemy licznik krokow, bez poprawy polozenia
+            } else {
+                idleSteps++; // nic sie nie stalo
+                dr *= 0.5; // zmniejszamy 2x dr
+            }
+        } // dr wciaz za duze
+
+        if (v < bestV) {  // znalezlismy najlepsze polozenie globalnie
+            bestV = v;
+            bestX = x;
+            bestY = y;
+            bestZ = z;
+
+            std::cout << "New better position: " << x << ", " << y << ", " << z << " value = " << v << std::endl;
+        }
+    } // mamy czas na obliczenia
+  }
 }
