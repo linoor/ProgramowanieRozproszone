@@ -53,8 +53,11 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   double random_1 = 0.0;
   double random_2 = 0.0;
   double random_3 = 0.0;
-  
-  #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, drand_buff)
+  double random_4 = 0.0;
+  double random_5 = 0.0;
+  double random_6 = 0.0;
+
+  #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, random_4, random_5, random_6, drand_buff, xnew, ynew, znew)
   {
     seed = time(NULL) + omp_get_thread_num();
     srand48_r(seed, &drand_buff);
@@ -75,9 +78,13 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
         dr = dr_ini;
 
         while (dr > dr_fin) {
-            xnew = x + (random() % 2 - 2) * dr;
-            ynew = y + (random() % 2 - 2) * dr;
-            znew = z + (random() % 2 - 2) * dr;
+            drand48_r(&drand_buff, &random_4);
+            drand48_r(&drand_buff, &random_5);
+            drand48_r(&drand_buff, &random_6);
+
+            xnew = x + ((int)random_4 % 2 - 2) * dr;
+            ynew = y + ((int)random_5 % 2 - 2) * dr;
+            znew = z + ((int)random_6 % 2 - 2) * dr;
 
             // upewniamy sie, ze nie opuscilismy przestrzeni poszukiwania rozwiazania
             xnew = limit(xnew);
@@ -99,13 +106,16 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
             }
         } // dr wciaz za duze
 
-        if (v < bestV) {  // znalezlismy najlepsze polozenie globalnie
-            bestV = v;
-            bestX = x;
-            bestY = y;
-            bestZ = z;
+        #pragma omp critical
+        {
+            if (v < bestV) {  // znalezlismy najlepsze polozenie globalnie
+                bestV = v;
+                bestX = x;
+                bestY = y;
+                bestZ = z;
 
-            std::cout << "New better position: " << x << ", " << y << ", " << z << " value = " << v << std::endl;
+                std::cout << "New better position: " << x << ", " << y << ", " << z << " value = " << v << std::endl;
+            }
         }
     } // mamy czas na obliczenia
   }
