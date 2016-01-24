@@ -4,6 +4,8 @@
 #include<iostream>
 #include <sys/time.h>
 
+#include <omp.h>
+
 Minimum::Minimum( Function *f, double min, double max ) : min( min ), max( max ), f(f) {
    bestX = bestY = bestZ = ( min + max ) * 0.5;
    bestV = f->value( bestX, bestY, bestZ );
@@ -91,4 +93,3 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   } // mamy czas na obliczenia
   
 }
-
