@@ -145,7 +145,7 @@ public class BaseShip {
     /**
      *
      * @return null if there is no ship nearby
-     * positio and course if there is a ship nearby
+     * position and course if there is a ship nearby
      * @throws RemoteException
      */
     public GameInterface.PositionAndCourse isThereShipNearby() throws RemoteException {
