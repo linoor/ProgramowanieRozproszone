@@ -61,13 +61,13 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   {
     seed = time(NULL) + omp_get_thread_num();
     srand48_r(seed, &drand_buff);
+    cout << "drandbuff " << drand_buff << endl;
 
     while (hasTimeToContinue()) {
+        // inicjujemy losowo polozenie startowe w obrebie kwadratu o bokach od min do max
         drand48_r(&drand_buff, &random_1);
         drand48_r(&drand_buff, &random_2);
         drand48_r(&drand_buff, &random_3);
-
-        // inicjujemy losowo polozenie startowe w obrebie kwadratu o bokach od min do max
         x = random_1 * ( max - min ) + min;
         y = random_2 * ( max - min ) + min;
         z = random_3 * ( max - min ) + min;
@@ -81,7 +81,6 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
             drand48_r(&drand_buff, &random_4);
             drand48_r(&drand_buff, &random_5);
             drand48_r(&drand_buff, &random_6);
-
             xnew = x + ((int)random_4 % 2 - 2) * dr;
             ynew = y + ((int)random_5 % 2 - 2) * dr;
             znew = z + ((int)random_6 % 2 - 2) * dr;
