@@ -15,10 +15,7 @@ public class Start {
 
     public static void main(String[] args) throws MalformedURLException,
             RemoteException, NotBoundException {
-        String host = (args.length < 1) ? null : args[0];
-        Registry registry = LocateRegistry.getRegistry(host);
-
-        GameInterface gi = (GameInterface) Naming.lookup("GAME");
+        GameInterface gi = (GameInterface) Naming.lookup("//"+args[0]+":1099/GAME");
         gameInterface = gi;
 
         System.out.println("Game interface proxy " + gi);

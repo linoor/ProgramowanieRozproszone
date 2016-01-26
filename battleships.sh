@@ -13,7 +13,7 @@ gnome-terminal --geometry=80x16+21+6 -t "Server" -x bash -c "java PMO_Server; ba
 echo $! >> $pid_file
 sleep 1
 # run my player
-gnome-terminal --geometry=80x16+16+446 -t "my player" -x bash -c "java Start myplayer; bash" &
+gnome-terminal --geometry=80x16+16+446 -t "my player" -x bash -c "java Start localhost; bash" &
 echo $! >> $pid_file
 sleep 1
 # run the first player
