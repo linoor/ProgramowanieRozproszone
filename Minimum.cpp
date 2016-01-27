@@ -53,9 +53,9 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   double random_1 = 0.0;
   double random_2 = 0.0;
   double random_3 = 0.0;
-  double random_4 = 0.0;
-  double random_5 = 0.0;
-  double random_6 = 0.0;
+  long random_4 = 0;
+  long random_5 = 0;
+  long random_6 = 0;
 
   #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, random_4, random_5, random_6, drand_buff, xnew, ynew, znew)
   {
@@ -77,12 +77,15 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
         dr = dr_ini;
 
         while (dr > dr_fin) {
-            drand48_r(&drand_buff, &random_4);
-            drand48_r(&drand_buff, &random_5);
-            drand48_r(&drand_buff, &random_6);
-            xnew = x + ((int)random_4 % 2 - 2) * dr;
-            ynew = y + ((int)random_5 % 2 - 2) * dr;
-            znew = z + ((int)random_6 % 2 - 2) * dr;
+            drand48_r(&drand_buff, &random_1);
+            drand48_r(&drand_buff, &random_2);
+            drand48_r(&drand_buff, &random_3);
+			int random_4 = (int) (random_1 * 10.00);
+			int random_5 = (int) (random_2 * 10.00);
+			int random_6 = (int) (random_3 * 10.00);
+            xnew = x + (random_4 % 2 - 2) * dr;
+            ynew = y + (random_5 % 2 - 2) * dr;
+            znew = z + (random_6 % 2 - 2) * dr;
 
             // upewniamy sie, ze nie opuscilismy przestrzeni poszukiwania rozwiazania
             xnew = limit(xnew);
