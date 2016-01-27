@@ -40,7 +40,7 @@ tms getTimes() {
 
 int main( int ac, char **av ) {
 
-   for ( int i = 2; i < MAX_THREADS; i++ ) {
+   for ( int i = 1; i < MAX_THREADS; i++ ) {
      cleanCounter();
      std::cout << "PMO: Dla watkow = " << i << std::endl;
      omp_set_num_threads( i );
