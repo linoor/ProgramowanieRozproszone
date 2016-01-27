@@ -57,7 +57,7 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
   long random_5 = 0;
   long random_6 = 0;
 
-  #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, random_4, random_5, random_6, drand_buff, xnew, ynew, znew)
+  #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, random_4, random_5, random_6, drand_buff, xnew, ynew, znew, v, vnew, dr, idleSteps)
   {
     seed = time(NULL) + omp_get_thread_num();
     srand48_r(seed, &drand_buff);
