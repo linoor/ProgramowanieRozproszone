@@ -107,7 +107,7 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
             }
         } // dr wciaz za duze
 
-        #pragma omp critical
+		#pragma omp critical
         {
             if (v < bestV) {  // znalezlismy najlepsze polozenie globalnie
                 bestV = v;
