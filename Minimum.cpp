@@ -59,7 +59,7 @@ void Minimum::find( double dr_ini, double dr_fin, int idleStepsLimit, double mse
 
   #pragma omp parallel private(x, y, z, seed, random_1, random_2, random_3, random_4, random_5, random_6, drand_buff, xnew, ynew, znew, v, vnew, dr, idleSteps)
   {
-    seed = time(NULL) + omp_get_thread_num();
+	seed = time(NULL) + omp_get_thread_num() * 1000;
     srand48_r(seed, &drand_buff);
 
     while (hasTimeToContinue()) {
